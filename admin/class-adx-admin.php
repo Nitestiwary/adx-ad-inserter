@@ -26,7 +26,6 @@ class Adx_Admin {
 	public function register_settings() {
 		// Central settings
 		$central_settings = array(
-			'adxbyms_enabled',
 			'adxbyms_popup_enabled',
 			'adxbyms_popup_network_code',
 			'adxbyms_popup_option',

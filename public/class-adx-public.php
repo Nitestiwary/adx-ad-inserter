@@ -113,9 +113,6 @@ class Adx_Public {
 	 * @return bool
 	 */
 	private function can_render_ads() {
-		if ( 'true' !== get_option( 'adxbyms_enabled', 'false' ) ) {
-			return false;
-		}
 		if ( is_admin() ) {
 			return false;
 		}

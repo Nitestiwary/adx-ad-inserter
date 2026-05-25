@@ -70,16 +70,7 @@ $status_registry = array(
 		<div class="form-header">
 			<h1 class="settings-title"><?php esc_html_e( 'AdX Ad Inserter', 'adx-ad-inserter' ); ?></h1>
 			<div class="form-actions">
-				<div class="form-toggle">
-					<h2 class="toggle-title">
-						<?php echo esc_html( $is_active ? __( 'Plugin Active', 'adx-ad-inserter' ) : __( 'Plugin Inactive', 'adx-ad-inserter' ) ); ?>
-					</h2>
-					<label class="switch">
-						<input type="hidden" name="adxbyms_enabled" value="false" />
-						<input type="checkbox" id="adxbyms_enabled" name="adxbyms_enabled" value="true" <?php checked( $is_active, true ); ?>>
-						<span class="slider round"></span>
-					</label>
-				</div>
+				<!-- Plugin Active toggle removed -->
 
 				<div class="head-banner">
 					<a href="https://monetiscope.com/contact/" target="_blank" rel="noopener noreferrer">
