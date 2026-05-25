@@ -174,17 +174,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		globalSwitch.addEventListener('change', function () {
 			globalTitle.textContent = this.checked ? adxbyms_strings.pluginActive : adxbyms_strings.pluginInactive;
 			
-			// Visually fade container if disabled
 			const container = document.querySelector('.settings-container');
 			if (container) {
 				if (this.checked) {
 					container.style.opacity = '1';
-					container.style.pointerEvents = 'auto';
-					container.style.cursor = 'default';
 				} else {
-					container.style.opacity = '0.5';
-					container.style.pointerEvents = 'none';
-					container.style.cursor = 'not-allowed';
+					container.style.opacity = '0.85';
 				}
 			}
 		});

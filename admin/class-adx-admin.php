@@ -205,22 +205,27 @@ class Adx_Admin {
 	 * Enqueue Admin Scripts and CSS Assets.
 	 */
 	public function enqueue_admin_assets( $hook ) {
-		if ( 'toplevel_page_adx-ad-inserter' !== $hook ) {
-			return;
+		if ( 'toplevel_page_adx-ad-inserter' !== $hook && 'adx-ad-inserter' !== $hook ) {
+			if ( ! isset( $_GET['page'] ) || 'adx-ad-inserter' !== $_GET['page'] ) {
+				return;
+			}
 		}
+
+		$css_version = ADXBYMS_VERSION . '.' . ( file_exists( ADXBYMS_PATH . 'assets/css/admin.css' ) ? filemtime( ADXBYMS_PATH . 'assets/css/admin.css' ) : time() );
+		$js_version  = ADXBYMS_VERSION . '.' . ( file_exists( ADXBYMS_PATH . 'assets/js/admin.js' ) ? filemtime( ADXBYMS_PATH . 'assets/js/admin.js' ) : time() );
 
 		wp_enqueue_style(
 			'adxbyms-admin-css',
 			ADXBYMS_URL_MODULAR . 'assets/css/admin.css',
 			array(),
-			ADXBYMS_VERSION
+			$css_version
 		);
 
 		wp_enqueue_script(
 			'adxbyms-admin-js',
 			ADXBYMS_URL_MODULAR . 'assets/js/admin.js',
 			array( 'jquery' ),
-			ADXBYMS_VERSION,
+			$js_version,
 			true
 		);
 

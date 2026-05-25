@@ -53,18 +53,21 @@ class Adx_Public {
 			return;
 		}
 
+		$css_version = ADXBYMS_VERSION . '.' . ( file_exists( ADXBYMS_PATH . 'assets/css/public.css' ) ? filemtime( ADXBYMS_PATH . 'assets/css/public.css' ) : time() );
+		$js_version  = ADXBYMS_VERSION . '.' . ( file_exists( ADXBYMS_PATH . 'assets/js/public.js' ) ? filemtime( ADXBYMS_PATH . 'assets/js/public.js' ) : time() );
+
 		wp_enqueue_style(
 			'adxbyms-public-css',
 			ADXBYMS_URL_MODULAR . 'assets/css/public.css',
 			array(),
-			ADXBYMS_VERSION
+			$css_version
 		);
 
 		wp_enqueue_script(
 			'adxbyms-public-js',
 			ADXBYMS_URL_MODULAR . 'assets/js/public.js',
 			array( 'jquery' ),
-			ADXBYMS_VERSION,
+			$js_version,
 			true
 		);
 

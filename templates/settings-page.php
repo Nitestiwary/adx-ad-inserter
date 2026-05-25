@@ -91,9 +91,8 @@ $status_registry = array(
 			</div>
 		</div>
 
-		<!-- Container (faded out if plugin is inactive) -->
-		<?php $container_style = $is_active ? '' : 'opacity:0.5; pointer-events:none; cursor:not-allowed;'; ?>
-		<div class="settings-container" style="<?php echo esc_attr( $container_style ); ?>">
+		<!-- Container -->
+		<div class="settings-container">
 			
 			<!-- Left side navigation + settings cards panels -->
 			<div class="settings-left">
