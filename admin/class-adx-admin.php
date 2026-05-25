@@ -17,7 +17,6 @@ class Adx_Admin {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'add_settings_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
-		add_filter( 'script_loader_tag', array( $this, 'add_module_type_to_zapier_script' ), 10, 3 );
 	}
 
 
@@ -230,30 +229,6 @@ class Adx_Admin {
 				'pluginInactive' => __( 'Plugin Inactive', 'adx-ad-inserter' ),
 			)
 		);
-
-		// Zapier Chatbot component enqueued securely
-		wp_enqueue_script(
-			'adxbyms-zapier-chatbot',
-			'https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js',
-			array(),
-			'1.0.0',
-			true
-		);
-	}
-
-	/**
-	 * Add module type attribute to Zapier script for ES module support.
-	 */
-	public function add_module_type_to_zapier_script( $tag, $handle, $src ) {
-		if ( 'adxbyms-zapier-chatbot' !== $handle ) {
-			return $tag;
-		}
-
-		if ( false !== strpos( $tag, '<script' ) ) {
-			$tag = preg_replace( '/<script\s+/', '<script type="module" ', $tag, 1 );
-		}
-
-		return $tag;
 	}
 }
 
