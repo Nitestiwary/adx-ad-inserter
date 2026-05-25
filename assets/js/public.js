@@ -200,7 +200,7 @@
 					'<img class="offerwall-logo" alt="Publisher Logo" src="' + this.config.logoUrl + '">',
 					'<h2>Unlock more content</h2>',
 					'<p>Engage with a quick offer to continue accessing content on this site.</p>',
-					'<button class="offerwall-btn" disabled style="cursor:not-allowed; opacity:0.6;">',
+					'<button class="offerwall-btn" disabled style="cursor:not-allowed; opacity:0.8;">',
 					'View a short ad <span class="offerwall-loading" style="display:none; margin-left:8px; font-size:12px;">Loading...</span>',
 					'</button>'
 				];

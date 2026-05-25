@@ -286,23 +286,25 @@
 
 #adxbyms-offerwall-bar .offerwall-btn,
 #adxbyms-btn-rewarded-bar .offerwall-btn {
-	background: #6366f1;
+	background: #2563eb;
 	color: #ffffff;
 	border-radius: 8px;
 	padding: 12px 24px;
 	font-size: 0.95rem;
-	font-weight: 600;
+	font-weight: 700;
 	cursor: pointer;
 	border: none;
 	width: 100%;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
 	transition: background-color 0.2s, box-shadow 0.2s;
-	box-shadow: 0 4px 10px rgba(99, 102, 241, 0.15);
+	box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
 }
 
 #adxbyms-offerwall-bar .offerwall-btn:hover:not(:disabled),
 #adxbyms-btn-rewarded-bar .offerwall-btn:hover:not(:disabled) {
-	background: #4f46e5;
-	box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
+	background: #1d4ed8;
+	box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
 }
 
 #adxbyms-offerwall-bar .offerwall-close-btn,
