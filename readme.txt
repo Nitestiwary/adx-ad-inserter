@@ -1,4 +1,4 @@
-=== AdX Ad Inserter ===
+=== AdX Ad Inserter - Adsense and Ad Manager Ads ===
 Contributors: monetiscopeadx
 Donate link: https://monetiscope.com/
 Tags: ads, adsense, ad-manager, google-adx, ad-inserter

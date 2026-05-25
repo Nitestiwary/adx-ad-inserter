@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: AdX Ad Inserter - Adsense and Ad Manager Ads
+ * Plugin Name: AdX Ad Inserter
  * Plugin URI: https://monetiscope.com/adx-ad-inserter-plugin/
  * Description: Insert Google AdX, Ad Manager, popup, rewarded, sticky, and in-content ads with precise placement controls. Built-in ads.txt editor.
  * Author: Monetiscope
