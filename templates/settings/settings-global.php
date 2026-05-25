@@ -111,6 +111,8 @@ $ads_label        = $ads_txt_en ? __( 'Active', 'adx-ad-inserter' ) : __( 'Disab
 					<span class="card-badge <?php echo esc_attr( $custom_badge ); ?>"><?php echo esc_html( $custom_label ); ?></span>
 					<span class="card-arrow">&rsaquo;</span>
 				</div>
+			</div>
+			<div class="card-body">
 				<div style="display:flex; justify-content:space-between; align-items:center; background: #eff6ff; padding:12px 20px; border-radius:8px; margin-bottom:20px; border-left:4px solid var(--adx-primary);">
 					<span style="font-weight: 600; font-size: 0.95rem; color: var(--adx-text);"><?php esc_html_e( 'Enable Footer Scripts', 'adx-ad-inserter' ); ?></span>
 					<label class="switch">
