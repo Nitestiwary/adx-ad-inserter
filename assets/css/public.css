@@ -233,8 +233,9 @@
 	}
 }
 
-/* 5. Offerwall Popup Consent Overlays Styling */
-#adxbyms-offerwall-bar {
+/* 5. Offerwall & Button Rewarded Popup Consent Overlays Styling */
+#adxbyms-offerwall-bar,
+#adxbyms-btn-rewarded-bar {
 	position: fixed;
 	top: 50%;
 	left: 50%;
@@ -245,12 +246,11 @@
 	border: 1px solid #e2e8f0;
 	padding: 32px 24px 24px;
 	box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
-	z-index: 9999999;
-	display: none;
-	text-align: center;
 	border-radius: 16px;
-	font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
-	animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+	z-index: 2147483647;
+	text-align: center;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes popIn {
@@ -258,7 +258,8 @@
 	to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
-#adxbyms-offerwall-bar .offerwall-logo {
+#adxbyms-offerwall-bar .offerwall-logo,
+#adxbyms-btn-rewarded-bar .offerwall-logo {
 	height: 80px;
 	width: auto;
 	margin: 0 auto 20px;
@@ -266,7 +267,8 @@
 	object-fit: contain;
 }
 
-#adxbyms-offerwall-bar h2 {
+#adxbyms-offerwall-bar h2,
+#adxbyms-btn-rewarded-bar h2 {
 	font-size: 1.25rem;
 	color: #0f172a;
 	font-weight: 700;
@@ -274,14 +276,16 @@
 	letter-spacing: -0.01em;
 }
 
-#adxbyms-offerwall-bar p {
+#adxbyms-offerwall-bar p,
+#adxbyms-btn-rewarded-bar p {
 	font-size: 0.9rem;
 	color: #475569;
 	margin: 0 0 24px 0;
 	line-height: 1.5;
 }
 
-#adxbyms-offerwall-bar .offerwall-btn {
+#adxbyms-offerwall-bar .offerwall-btn,
+#adxbyms-btn-rewarded-bar .offerwall-btn {
 	background: #6366f1;
 	color: #ffffff;
 	border-radius: 8px;
@@ -295,12 +299,14 @@
 	box-shadow: 0 4px 10px rgba(99, 102, 241, 0.15);
 }
 
-#adxbyms-offerwall-bar .offerwall-btn:hover:not(:disabled) {
+#adxbyms-offerwall-bar .offerwall-btn:hover:not(:disabled),
+#adxbyms-btn-rewarded-bar .offerwall-btn:hover:not(:disabled) {
 	background: #4f46e5;
 	box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
 }
 
-#adxbyms-offerwall-bar .offerwall-close-btn {
+#adxbyms-offerwall-bar .offerwall-close-btn,
+#adxbyms-btn-rewarded-bar .offerwall-close-btn {
 	position: absolute;
 	top: 14px;
 	right: 14px;
@@ -311,16 +317,17 @@
 	color: #94a3b8;
 	cursor: pointer;
 	padding: 4px;
-	transition: color 0.2s, transform 0.2s;
-	display: flex;
-	justify-content: center;
-	align-items: center;
 	width: 32px;
 	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s;
 	border-radius: 50%;
 }
 
-#adxbyms-offerwall-bar .offerwall-close-btn:hover {
+#adxbyms-offerwall-bar .offerwall-close-btn:hover,
+#adxbyms-btn-rewarded-bar .offerwall-close-btn:hover {
 	color: #0f172a;
 	background: #f1f5f9;
 }

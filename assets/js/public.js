@@ -214,11 +214,20 @@
 				});
 
 				// Wire action button
-				$(this.bar).find('.offerwall-btn').on('click', () => {
-					if (!this.rewardedEvt) return;
-					$(this.bar).find('.offerwall-loading').show();
-					this.bar.style.display = "none";
-					this.rewardedEvt.makeRewardedVisible();
+				$(this.bar).find('.offerwall-btn').on('click', (e) => {
+					e.preventDefault();
+					if (!this.rewardedEvt) {
+						console.warn('[AdX] Rewarded ad not ready yet.');
+						return;
+					}
+					
+					try {
+						this.rewardedEvt.makeRewardedVisible();
+						this.bar.style.display = "none";
+					} catch (err) {
+						console.error('[AdX] Failed to show rewarded ad', err);
+						this.bar.style.display = "none";
+					}
 				});
 			},
 
@@ -335,6 +344,171 @@
 		};
 
 		offerwallModule.init();
+
+		// --- 3.5. Button Rewarded Ad (Keyword Click) ---
+		const btnRewardedModule = {
+			config: window.ADXBYMS_BUTTON_REWARDED_DATA || {},
+			bar: null,
+			rewardedEvt: null,
+			adInitialized: false,
+			pendingTargetUrl: null,
+
+			init: function () {
+				if (!this.config.enabled || !this.config.networkCode || !this.config.keywords) {
+					return;
+				}
+
+				this.buildUI();
+				
+				const keywords = this.config.keywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k);
+				if (keywords.length === 0) return;
+
+				// Bind to clicks on links/buttons
+				$('body').on('click', 'a, button', (e) => {
+					const el = $(e.currentTarget);
+					const text = el.text().toLowerCase();
+					
+					let match = false;
+					for (const kw of keywords) {
+						if (text.includes(kw)) {
+							match = true;
+							break;
+						}
+					}
+					
+					if (match) {
+						e.preventDefault();
+						// Only store href if it's a real link, otherwise null (button action might be handled via ajax)
+						const href = el.attr('href');
+						this.pendingTargetUrl = (href && href !== '#' && !href.startsWith('javascript:')) ? href : null;
+						this.showOfferwall();
+					}
+				});
+			},
+
+			buildUI: function () {
+				this.bar = document.createElement("div");
+				this.bar.id = "adxbyms-btn-rewarded-bar";
+				this.bar.style.display = "none";
+
+				const barHTML = [
+					'<button class="offerwall-close-btn" aria-label="Close Pop-up ad">&times;</button>',
+					'<img class="offerwall-logo" alt="Publisher Logo" src="' + this.config.logoUrl + '">',
+					'<h2>Unlock more content</h2>',
+					'<p>Engage with a quick offer to continue accessing content on this site.</p>',
+					'<button class="offerwall-btn" disabled style="cursor:not-allowed; opacity:0.6;">',
+					'View a short ad <span class="offerwall-loading" style="display:none; margin-left:8px; font-size:12px;">Loading...</span>',
+					'</button>'
+				];
+
+				this.bar.innerHTML = barHTML.join("");
+				document.body.appendChild(this.bar);
+
+				// Wire close button
+				$(this.bar).find('.offerwall-close-btn').on('click', () => {
+					this.bar.style.display = "none";
+					if (this.pendingTargetUrl) window.location.href = this.pendingTargetUrl;
+					this.pendingTargetUrl = null;
+				});
+
+				// Wire action button
+				$(this.bar).find('.offerwall-btn').on('click', (e) => {
+					e.preventDefault();
+					if (!this.rewardedEvt) {
+						console.warn('[AdX Btn Rewarded] Ad not ready yet.');
+						return;
+					}
+					
+					try {
+						this.rewardedEvt.makeRewardedVisible();
+						this.bar.style.display = "none";
+					} catch (err) {
+						console.error('[AdX Btn Rewarded] Failed to show ad', err);
+						this.bar.style.display = "none";
+						if (this.pendingTargetUrl) window.location.href = this.pendingTargetUrl;
+					}
+				});
+			},
+
+			showOfferwall: function () {
+				this.bar.style.display = "block";
+				this.initRewardedSlot();
+			},
+
+			initRewardedSlot: function () {
+				if (this.adInitialized) return;
+				this.adInitialized = true;
+
+				window.googletag = window.googletag || { cmd: [] };
+				
+				const checkAndRegister = () => {
+					googletag.cmd.push(() => {
+						try {
+							const slot = googletag.defineOutOfPageSlot(
+								this.config.networkCode,
+								googletag.enums.OutOfPageFormat.REWARDED
+							);
+
+							if (!slot) {
+								this.bar.style.display = "none";
+								if (this.pendingTargetUrl) window.location.href = this.pendingTargetUrl;
+								return;
+							}
+
+							slot.addService(googletag.pubads());
+							
+							googletag.pubads().addEventListener('rewardedSlotReady', (evt) => {
+								// Ensure this event belongs to our slot
+								if (evt.slot === slot) {
+									this.rewardedEvt = evt;
+									const btn = $(this.bar).find('.offerwall-btn');
+									btn.prop('disabled', false).css({
+										'cursor': 'pointer',
+										'opacity': '1'
+									});
+								}
+							});
+
+							googletag.pubads().addEventListener('rewardedSlotClosed', (evt) => {
+								if (evt.slot === slot) {
+									$(this.bar).find('.offerwall-loading').hide();
+									if (this.pendingTargetUrl) {
+										window.location.href = this.pendingTargetUrl;
+									}
+								}
+							});
+
+							googletag.enableServices();
+							googletag.display(slot);
+
+						} catch (e) {
+							console.error('[AdX Btn Rewarded] GPT Registration error:', e);
+							this.bar.style.display = "none";
+							if (this.pendingTargetUrl) window.location.href = this.pendingTargetUrl;
+						}
+					});
+				};
+
+				if (typeof googletag !== 'undefined' && typeof googletag.defineOutOfPageSlot !== 'undefined') {
+					checkAndRegister();
+				} else {
+					var attempts = 0;
+					const timer = setInterval(() => {
+						attempts++;
+						if (typeof googletag !== 'undefined' && typeof googletag.defineOutOfPageSlot !== 'undefined') {
+							clearInterval(timer);
+							checkAndRegister();
+						} else if (attempts >= 100) {
+							clearInterval(timer);
+							this.bar.style.display = "none";
+							if (this.pendingTargetUrl) window.location.href = this.pendingTargetUrl;
+						}
+					}, 100);
+				}
+			}
+		};
+
+		btnRewardedModule.init();
 
 		// --- 4. Client-Side HTML Selector Transplant Engine ---
 		$('.adxbyms-html-placeholder').each(function () {

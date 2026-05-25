@@ -108,6 +108,22 @@ class Adx_Public {
 				'triggerPercent' => 60,
 			)
 		);
+
+		// Localize Button Rewarded settings
+		$btn_rewarded_enabled = ( 'true' === get_option( 'adxbyms_ad2_enabled', 'false' ) );
+		$btn_rewarded_code    = get_option( 'adxbyms_ad2_network_code', '' );
+		$btn_rewarded_kw      = get_option( 'adxbyms_ad2_keywords', '' );
+
+		wp_localize_script(
+			'adxbyms-public-js',
+			'ADXBYMS_BUTTON_REWARDED_DATA',
+			array(
+				'enabled'     => $btn_rewarded_enabled && ! empty( $btn_rewarded_code ),
+				'networkCode' => esc_js( $btn_rewarded_code ),
+				'keywords'    => esc_js( $btn_rewarded_kw ),
+				'logoUrl'     => esc_url( $offerwall_logo ),
+			)
+		);
 	}
 
 	/**
