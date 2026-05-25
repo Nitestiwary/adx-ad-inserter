@@ -24,7 +24,7 @@ class Adx_Ad_Inserter_Core {
 	 */
 	private function define_constants() {
 		if ( ! defined( 'ADXBYMS_VERSION' ) ) {
-			define( 'ADXBYMS_VERSION', '1.4.1' );
+			define( 'ADXBYMS_VERSION', '1.4.0' );
 		}
 		if ( ! defined( 'ADXBYMS_PATH' ) ) {
 			define( 'ADXBYMS_PATH', plugin_dir_path( ADXBYMS_FILE ) );

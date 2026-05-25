@@ -4,7 +4,7 @@ Donate link: https://monetiscope.com/
 Tags: ads, adsense, ad-manager, google-adx, ad-inserter, side-rails, flying-carpet, responsive-ads
 Requires at least: 5.0
 Tested up to: 6.9
-Stable tag: 1.4.1
+Stable tag: 1.4.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -107,16 +107,14 @@ This plugin enqueues the following external script resources:
 
 == Changelog ==
 
-= 1.4.1 =
+= 1.4.0 =
+* Restructured: Reorganized plugin into premium modular architecture (admin, public, includes, assets, templates).
 * Refactored: Overhauled settings page UI with a premium, modern Slate/Indigo HSL theme and custom Outfit/Inter Google Fonts family.
 * Improved: Grouped primary sidebar navigation under distinct Standard Placements, Advanced Ads, and Configuration categories with Dashicons, renaming the tab to a simple "Settings" button.
 * Restructured: Split Exclude Links, Header Script, Footer Script, and Ads.txt Manager separately as distinct stacked collapsible card panels vertically.
 * Improved: Refined Responsive Ads "Index (X)" offset field to keep it visible at all times, adding dynamic dimmed/disabled states when standard insertions are selected, and instantly illuminating it on tag-based placements.
 * Restored: Fully re-integrated the broken frontend loader for Offerwall Ads (onscroll) and added a highly requested close/skip button, allowing visitors to temporarily skip the ad for their session.
 * Fixed: Updated the Zapier chatbot script widget to run asynchronously in the admin panel.
-
-= 1.4.0 =
-* Restructured: Reorganized plugin into premium modular architecture (admin, public, includes, assets, templates).
 * Added: Adsense Ads / Custom section supporting 10 independent blocks, raw textareas, heading insertions, and alignments.
 * Added: Display Ads dimension update adding 320x480 and 480x320 selections.
 * Added: Responsive Ads section auto-mapping 728x90 (Desktop) and 300x250 (Mobile) GAM slots.
