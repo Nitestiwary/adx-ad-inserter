@@ -100,6 +100,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	setupSubtabs('.display-tab', '.display-content');
 	setupSubtabs('.responsive-tab', '.responsive-content');
 	setupSubtabs('.flying-carpet-tab', '.flying-carpet-content');
+	setupSubtabs('.global-tab', '.global-content');
+
 
 	// --- 3. Collapsible Card Toggle (for Adsense Ads / Custom) ---
 	const cardHeaders = document.querySelectorAll('.card-header');

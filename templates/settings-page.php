@@ -19,13 +19,11 @@ $tabs = array(
 	'tab-popup-updated'    => __( 'Popup Ads', 'adx-ad-inserter' ),
 	'tab-flying-carpet'    => __( 'Flying Carpet Ads', 'adx-ad-inserter' ),
 	'tab-side-rail'        => __( 'Side Rail Ads', 'adx-ad-inserter' ),
-	'tab-exclude-links'    => __( 'Exclude Links', 'adx-ad-inserter' ),
 	'tab-anchor'           => __( 'Anchor Ad', 'adx-ad-inserter' ),
 	'tab-button-rewarded'  => __( 'Button Rewarded Ad', 'adx-ad-inserter' ),
 	'tab-offerwall'        => __( 'Offerwall Ad', 'adx-ad-inserter' ),
 	'tab-interstitial'     => __( 'Interstitial Ad', 'adx-ad-inserter' ),
-	'tab-header-footer'    => __( 'Header/Footer Scripts', 'adx-ad-inserter' ),
-	'tab-ads-txt'          => __( 'Ads.Txt Manager', 'adx-ad-inserter' ),
+	'tab-global-settings'  => __( 'Global Settings', 'adx-ad-inserter' ),
 );
 
 // Map Tabs to Template Panels
@@ -36,13 +34,11 @@ $panels = array(
 	'tab-popup-updated'    => 'settings-popup.php',
 	'tab-flying-carpet'    => 'settings-flying-carpet.php',
 	'tab-side-rail'        => 'settings-side-rail.php',
-	'tab-exclude-links'    => 'settings-exclude-links.php',
 	'tab-anchor'           => 'settings-anchor.php',
 	'tab-button-rewarded'  => 'settings-button-rewarded.php',
 	'tab-offerwall'        => 'settings-offerwall-onscroll.php',
 	'tab-interstitial'     => 'settings-interstitial.php',
-	'tab-header-footer'    => 'settings-custom.php',
-	'tab-ads-txt'          => 'settings-ads-txt.php',
+	'tab-global-settings'  => 'settings-global.php',
 );
 
 // Slot Status Registry for Sidebar Indicators
@@ -57,8 +53,11 @@ $status_registry = array(
 	'Button Rewarded'      => array( 'enabled' => 'adxbyms_ad2_enabled', 'code' => 'adxbyms_ad2_network_code' ),
 	'Offerwall Ad'         => array( 'enabled' => 'adxbyms_offerwall_onscroll_enabled', 'code' => 'adxbyms_offerwall_onscroll_network_code' ),
 	'Interstitial Ad'      => array( 'enabled' => 'adxbyms_interstitial_enabled', 'code' => 'adxbyms_interstitial_network_code' ),
+	'Global Settings'      => array( 'enabled' => 'adxbyms_custom_enabled', 'type' => 'global-settings' ),
 );
 ?>
+
+
 
 <div class="wrap">
 	<form method="post" action="options.php">
@@ -186,7 +185,19 @@ $status_registry = array(
 										}
 									}
 								}
+							} elseif ( 'global-settings' === $type ) {
+								$hdr = trim( (string) get_option( 'adxbyms_header_code', '' ) );
+								$ftr = trim( (string) get_option( 'adxbyms_footer_code', '' ) );
+								$excl = trim( (string) get_option( 'adxbyms_exclude_links', '' ) );
+								$ads_code = trim( (string) get_option( 'adxbyms_ads_txt_code', '' ) );
+								if ( ! empty( $hdr ) || ! empty( $ftr ) || ! empty( $excl ) || ! empty( $ads_code ) ) {
+									$any_code_saved = true;
+									if ( 'true' === get_option( 'adxbyms_custom_enabled', 'false' ) || 'true' === get_option( 'adxbyms_ads_txt_enabled', 'false' ) || ! empty( $excl ) ) {
+										$any_sub_enabled = true;
+									}
+								}
 							}
+
 							
 							if ( ! $any_code_saved ) {
 								$status_class = 'status-empty';
