@@ -378,17 +378,12 @@
 					}
 					
 					if (match) {
-						if (this.rewardedEvt) {
-							e.preventDefault();
-							const href = el.attr('href');
-							this.pendingTargetUrl = (href && href !== '#' && !href.startsWith('javascript:')) ? href : null;
-							
-							// Show the consent popup instead of immediately triggering the ad
-							this.showConsentPopup();
-						} else {
-							// Ad not ready yet, let the normal click happen
-							console.warn('[AdX Btn Rewarded] Ad not ready yet, ignoring keyword click.');
-						}
+						e.preventDefault();
+						const href = el.attr('href');
+						this.pendingTargetUrl = (href && href !== '#' && !href.startsWith('javascript:')) ? href : null;
+						
+						// Always show the consent popup if keyword matches
+						this.showConsentPopup();
 					}
 				});
 			},
@@ -418,12 +413,29 @@
 					this.pendingTargetUrl = null;
 				});
 
-				$(this.consentOverlay).on('click', '#adxbyms-btn-rewarded-allow', () => {
-					this.consentOverlay.style.display = "none";
+				$(this.consentOverlay).on('click', '#adxbyms-btn-rewarded-allow', (e) => {
+					e.preventDefault();
+					const btn = $(e.currentTarget);
+
+					if (!this.rewardedEvt) {
+						// Ad is not ready or failed to load. Fallback: just proceed immediately.
+						console.warn('[AdX Btn Rewarded] Ad not ready, proceeding to link directly.');
+						this.consentOverlay.style.display = "none";
+						if (this.pendingTargetUrl) window.location.href = this.pendingTargetUrl;
+						return;
+					}
+
+					btn.text('Loading...');
+					btn.prop('disabled', true);
+					
 					try {
 						this.rewardedEvt.makeRewardedVisible();
+						this.consentOverlay.style.display = "none";
+						btn.text('Watch Ad'); // reset for next time
+						btn.prop('disabled', false);
 					} catch (err) {
 						console.error('[AdX Btn Rewarded] Failed to show ad', err);
+						this.consentOverlay.style.display = "none";
 						if (this.pendingTargetUrl) window.location.href = this.pendingTargetUrl;
 					}
 				});
