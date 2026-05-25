@@ -4,7 +4,7 @@ Donate link: https://monetiscope.com/
 Tags: ads, adsense, ad-manager, google-adx, ad-inserter, side-rails, flying-carpet, responsive-ads
 Requires at least: 5.0
 Tested up to: 6.9
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -21,7 +21,7 @@ This version introduces **AdX Ad Inserter Premium Updates**, introducing advance
 
 * **Centralized GPT Script Manager** - Loads `gpt.js` exactly once globally with proper async queuing to prevent duplicate initialization, reduce Cumulative Layout Shift (CLS), and boost page load times.
 * **AdSense Ads / Custom Sections** - 10 independent code blocks supporting raw script textareas, strict admin HTML sanitization, 8 insertion hook categories (including Before Headings!), alignments, and separate mobile/tablet/desktop screen filters.
-* **Responsive Ads** - 5 independent slots auto-mapping GAM creatives dynamically (728x90 on Desktop and 300x250 on Mobile viewports) with unique div ID allocations.
+* **Responsive Ads** - 5 independent slots auto-mapping GAM creatives dynamically (728x90 on Desktop and 300x250 on Mobile viewports) with unique div ID allocations and custom "Index (X)" offset targets.
 * **Updated Popup Overlay** - 24-hour rate limit tracking using client-side localStorage, device filter switches, and advanced category/post page targeting options.
 * **Flying Carpet Ads** - 5 parallax scrolling ad blocks with viewport-relative clipping, lazy loading, and smooth CSS acceleration.
 * **Side Rail Ads** - Sticky left and right column rails for screens wider than 1200px. Supports viewability-based dynamic refreshing (min 30s) and close buttons.
@@ -67,7 +67,7 @@ This version introduces **AdX Ad Inserter Premium Updates**, introducing advance
 3. Configure your ad blocks under individual tabs:
    * **Display Slots**: Configure standard GAM units (adds support for 320x480 and 480x320 mobile dimensions).
    * **Adsense Ads / Custom**: Paste your raw AdSense or scripts, choose insertion (e.g. before heading), alignment, and targets.
-   * **Responsive Ads**: Enter your responsive ad slot line and define standard placements.
+   * **Responsive Ads**: Enter your responsive ad slot line and define standard placements. Supports precise "Index (X)" offset targets.
    * **Popup Ads**: Enter slot path, trigger scroll depth, target screens, and set cap to "one time in 24 hours".
    * **Flying Carpet Ads**: Enable full-screen mobile-optimized parallax slots inside content paragraphs.
    * **Side Rail Ads**: Add a single slot line to automatically float matching left/right columns on desktop screens.
@@ -106,6 +106,14 @@ This plugin enqueues the following external script resources:
   * **Privacy**: [Zapier Privacy Policy](https://zapier.com/privacy).
 
 == Changelog ==
+
+= 1.4.1 =
+* Refactored: Overhauled settings page UI with a premium, modern Slate/Indigo HSL theme and custom Outfit/Inter Google Fonts family.
+* Improved: Grouped primary sidebar navigation under distinct Standard Placements, Advanced Ads, and Configuration categories with Dashicons, renaming the tab to a simple "Settings" button.
+* Restructured: Split Exclude Links, Header Script, Footer Script, and Ads.txt Manager separately as distinct stacked collapsible card panels vertically.
+* Improved: Refined Responsive Ads "Index (X)" offset field to keep it visible at all times, adding dynamic dimmed/disabled states when standard insertions are selected, and instantly illuminating it on tag-based placements.
+* Restored: Fully re-integrated the broken frontend loader for Offerwall Ads (onscroll) and added a highly requested close/skip button, allowing visitors to temporarily skip the ad for their session.
+* Fixed: Updated the Zapier chatbot script widget to run asynchronously in the admin panel.
 
 = 1.4.0 =
 * Restructured: Reorganized plugin into premium modular architecture (admin, public, includes, assets, templates).
