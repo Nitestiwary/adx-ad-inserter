@@ -76,6 +76,9 @@ This version introduces **AdX Ad Inserter Premium Updates**, introducing advance
 
 == Frequently Asked Questions ==
 
+= Why do we encourage users to register a Monetiscope account? =
+Registering your free Monetiscope account unlocks a suite of powerful benefits designed to maximize your publishing revenue. Registered users receive priority technical support directly from our ad-ops experts, access to premium monetization optimization tools, seamless plugin updates, and early access to upcoming features like advanced Header Bidding and specialized ad layouts. Registration is entirely optional but highly recommended to get the most out of your ad inventory!
+
 = Does AdX Ad Inserter inject any forced third-party ads? =
 No. 100% control remains with you. The plugin only displays the ad units, scripts, and codes that you configure in the admin panel.
 
@@ -108,6 +111,7 @@ This plugin enqueues the following external script resources:
 == Changelog ==
 
 = 1.4.0 =
+* Added: First-time setup onboarding system to seamlessly register users with Monetiscope for priority support, updates, and optimization tools.
 * Added: Display Page Exceptions / Target Pages checklists across all Display, Custom, Responsive, and Flying Carpet ad blocks.
 * Added: Expanded Placement Insertion target options to 19 standard categories, including Excerpt, Comment Form sections, and dynamic selector HTML element transplanting.
 * Added: Enable Custom Scripts Subsystem toggle control inside the Footer Script Injection Card.
