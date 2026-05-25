@@ -396,15 +396,15 @@
 			buildConsentUI: function () {
 				this.consentOverlay = document.createElement("div");
 				this.consentOverlay.id = "adxbyms-btn-rewarded-consent";
-				this.consentOverlay.style.cssText = "display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.6); z-index:2147483647; align-items:center; justify-content:center; backdrop-filter:blur(3px);";
+				this.consentOverlay.style.cssText = "display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0, 0, 0, 0.4); z-index:2147483647; align-items:center; justify-content:center;";
 
 				const modalHTML = [
-					'<div style="background:#ffffff; padding:28px; border-radius:12px; width:90%; max-width:340px; text-align:center; font-family:-apple-system, BlinkMacSystemFont, sans-serif; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">',
-					'<h3 style="margin:0 0 12px 0; font-size:1.2rem; color:#0f172a;">View a short ad to proceed</h3>',
-					'<p style="margin:0 0 24px 0; color:#475569; font-size:0.95rem; line-height:1.5;">Please allow a quick ad to continue to your destination.</p>',
+					'<div style="background:#ffffff; padding:32px 24px; border-radius:8px; width:90%; max-width:380px; text-align:center; font-family:-apple-system, BlinkMacSystemFont, sans-serif; box-shadow:0 10px 25px rgba(0,0,0,0.2);">',
+					'<h3 style="margin:0 0 12px 0; font-size:1.15rem; color:#333; font-weight:normal;">To <strong>proceed</strong>, please watch a short ad</h3>',
+					'<p style="margin:0 0 24px 0; color:#888; font-size:0.9rem;">(Cancel = no continuation)</p>',
 					'<div style="display:flex; gap:12px; justify-content:center;">',
-					'<button id="adxbyms-btn-rewarded-cancel" style="flex:1; padding:10px 16px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; border-radius:6px; font-weight:600; font-size:0.95rem; cursor:pointer;">Cancel</button>',
-					'<button id="adxbyms-btn-rewarded-allow" style="flex:1; padding:10px 16px; border:none; background:#6366f1; color:#ffffff; border-radius:6px; font-weight:600; font-size:0.95rem; cursor:pointer; box-shadow:0 4px 6px -1px rgba(99,102,241,0.2);">Allow</button>',
+					'<button id="adxbyms-btn-rewarded-allow" style="flex:1; padding:12px 16px; border:none; background:#3b82f6; color:#ffffff; border-radius:6px; font-weight:600; font-size:1rem; cursor:pointer; transition:background 0.2s;">Watch Ad</button>',
+					'<button id="adxbyms-btn-rewarded-cancel" style="flex:1; padding:12px 16px; border:none; background:#ef4444; color:#ffffff; border-radius:6px; font-weight:600; font-size:1rem; cursor:pointer; transition:background 0.2s;">Not Now</button>',
 					'</div>',
 					'</div>'
 				];
