@@ -4,7 +4,7 @@ Donate link: https://monetiscope.com/
 Tags: ads, adsense, ad-manager, google-adx, ad-inserter, side-rails, flying-carpet, responsive-ads
 Requires at least: 5.0
 Tested up to: 6.9
-Stable tag: 1.4.0
+Stable tag: 1.3.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -110,7 +110,7 @@ This plugin enqueues the following external script resources:
 
 == Changelog ==
 
-= 1.4.0 =
+= 1.3.1 =
 * Added: First-time setup onboarding system to seamlessly register users with Monetiscope for priority support, updates, and optimization tools.
 * Added: Display Page Exceptions / Target Pages checklists across all Display, Custom, Responsive, and Flying Carpet ad blocks.
 * Added: Expanded Placement Insertion target options to 19 standard categories, including Excerpt, Comment Form sections, and dynamic selector HTML element transplanting.
@@ -152,5 +152,5 @@ This plugin enqueues the following external script resources:
 
 == Upgrade Notice ==
 
-= 1.4.0 =
+= 1.3.1 =
 Highly recommended premium upgrade. Adds new ad formats (AdSense, Custom, Responsive, Flying Carpet Parallax, Sticky Side Rails), centralized GPT loading for faster pages, 24h popup capping, and robust URL exclusion targeting. Completely backward-compatible.
