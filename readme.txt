@@ -1,7 +1,7 @@
 === AdX Ad Inserter ===
 Contributors: monetiscopeadx
 Donate link: https://monetiscope.com/
-Tags: ads, adsense, ad-manager, google-adx, ad-inserter, side-rails, flying-carpet, responsive-ads
+Tags: ads, adsense, ad-manager, google-adx, ad-inserter
 Requires at least: 5.0
 Tested up to: 6.9
 Stable tag: 1.3.1
@@ -9,7 +9,7 @@ Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Insert Google AdX, Ad Manager, AdSense, Custom HTML/JS, popup, rewarded, side rails, flying carpets, and in-content ads. Features a built-in ads.txt editor, centralized GPT manager, and advanced URL exclusions.
+Insert Google AdX, Ad Manager, AdSense, popup, rewarded, side rails, and in-content ads. Features an ads.txt editor and centralized GPT manager.
 
 == Description ==
 
