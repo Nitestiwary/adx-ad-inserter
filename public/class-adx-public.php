@@ -932,7 +932,7 @@ class Adx_Public {
 		}
 
 		// 4. Custom footer scripts
-		if ( 'true' === get_option( 'adxbyms_custom_enabled', 'false' ) ) {
+		if ( 'true' === get_option( 'adxbyms_footer_custom_enabled', 'false' ) ) {
 			$footer_code = get_option( 'adxbyms_footer_code', '' );
 			if ( ! empty( $footer_code ) ) {
 				echo wp_unslash( $footer_code ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

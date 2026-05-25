@@ -13,6 +13,7 @@ $exclusions       = get_option( 'adxbyms_exclude_links', '' );
 $header_code      = get_option( 'adxbyms_header_code', '' );
 $footer_code      = get_option( 'adxbyms_footer_code', '' );
 $custom_enabled   = ( 'true' === get_option( 'adxbyms_custom_enabled', 'false' ) );
+$footer_custom_enabled = ( 'true' === get_option( 'adxbyms_footer_custom_enabled', 'false' ) );
 $ads_txt_en       = ( 'true' === get_option( 'adxbyms_ads_txt_enabled', 'false' ) );
 $ads_txt_val      = get_option( 'adxbyms_ads_txt_code', '' );
 
@@ -110,9 +111,14 @@ $ads_label        = $ads_txt_en ? __( 'Active', 'adx-ad-inserter' ) : __( 'Disab
 					<span class="card-badge <?php echo esc_attr( $custom_badge ); ?>"><?php echo esc_html( $custom_label ); ?></span>
 					<span class="card-arrow">&rsaquo;</span>
 				</div>
-			</div>
-			<div class="card-body">
-				<!-- Footer scripts section without duplicate toggle -->
+				<div style="display:flex; justify-content:space-between; align-items:center; background: #eff6ff; padding:12px 20px; border-radius:8px; margin-bottom:20px; border-left:4px solid var(--adx-primary);">
+					<span style="font-weight: 600; font-size: 0.95rem; color: var(--adx-text);"><?php esc_html_e( 'Enable Footer Scripts', 'adx-ad-inserter' ); ?></span>
+					<label class="switch">
+						<input type="hidden" name="adxbyms_footer_custom_enabled" value="false" />
+						<input type="checkbox" name="adxbyms_footer_custom_enabled" value="true" <?php checked( $footer_custom_enabled, true ); ?> />
+						<span class="slider round"></span>
+					</label>
+				</div>
 
 				<p class="description" style="margin-top: 0; margin-bottom: 20px; color: var(--adx-text-muted);">
 					<?php esc_html_e( 'Inject tracker pixels, conversion counters, or body script tags globally right before the closing </body> tag.', 'adx-ad-inserter' ); ?>

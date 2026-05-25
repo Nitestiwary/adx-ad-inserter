@@ -42,6 +42,7 @@ class Adx_Admin {
 			'adxbyms_interstitial_enabled',
 			'adxbyms_interstitial_network_code',
 			'adxbyms_custom_enabled',
+			'adxbyms_footer_custom_enabled',
 			'adxbyms_ads_txt_enabled',
 			'adxbyms_slot_enabled',
 			
