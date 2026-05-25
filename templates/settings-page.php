@@ -68,7 +68,10 @@ $status_registry = array(
 
 		<!-- Glassmorphism Dashboard Header -->
 		<div class="form-header">
-			<h1 class="settings-title"><?php esc_html_e( 'AdX Ad Inserter', 'adx-ad-inserter' ); ?></h1>
+			<h1 class="settings-title">
+				<span class="settings-title-text"><?php esc_html_e( 'AdX Ad Inserter', 'adx-ad-inserter' ); ?></span>
+				<span class="pro-badge">PRO</span>
+			</h1>
 			<div class="form-actions">
 
 

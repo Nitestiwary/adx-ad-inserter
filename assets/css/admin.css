@@ -56,9 +56,28 @@
 	margin: 0 !important;
 	padding: 0 !important;
 	letter-spacing: -0.03em;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.settings-title-text {
 	background: linear-gradient(135deg, #0f172a 0%, #4f46e5 100%);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
+}
+
+.pro-badge {
+	font-size: 0.85rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	background: linear-gradient(135deg, var(--adx-primary) 0%, #a855f7 100%);
+	color: white;
+	padding: 4px 10px;
+	border-radius: 8px;
+	letter-spacing: 1px;
+	box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+	margin-top: 4px;
 }
 
 .settings-separator {
