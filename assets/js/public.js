@@ -166,6 +166,175 @@
 				observer.observe(container);
 			});
 		}
+
+		// --- 3. Offerwall Ad Consent Overlays with Close Icon (Skip temporarily) ---
+		const offerwallModule = {
+			config: window.ADXBYMS_OFFERWALL_DATA || {},
+			sessionKey: 'adxbyms_offerwall_shown',
+			bar: null,
+			rewardedEvt: null,
+			adInitialized: false,
+
+			init: function () {
+				if (!this.config.enabled || !this.config.networkCode) {
+					return;
+				}
+
+				if (sessionStorage.getItem(this.sessionKey) === 'true') {
+					return; // Already shown or skipped in this session
+				}
+
+				this.buildUI();
+				
+				// Show on scroll > triggerPercent
+				window.addEventListener('scroll', this.onScroll.bind(this), { passive: true });
+			},
+
+			buildUI: function () {
+				this.bar = document.createElement("div");
+				this.bar.id = "adxbyms-offerwall-bar";
+				this.bar.style.display = "none";
+
+				const barHTML = [
+					'<button class="offerwall-close-btn" aria-label="Close Pop-up ad">&times;</button>',
+					'<img class="offerwall-logo" alt="Publisher Logo" src="' + this.config.logoUrl + '">',
+					'<h2>Unlock more content</h2>',
+					'<p>Engage with a quick offer to continue accessing content on this site.</p>',
+					'<button class="offerwall-btn" disabled style="cursor:not-allowed; opacity:0.6;">',
+					'View a short ad <span class="offerwall-loading" style="display:none; margin-left:8px; font-size:12px;">Loading...</span>',
+					'</button>'
+				];
+
+				this.bar.innerHTML = barHTML.join("");
+				document.body.appendChild(this.bar);
+
+				// Wire close button (Skip temporarily)
+				$(this.bar).find('.offerwall-close-btn').on('click', () => {
+					this.dismissTemporarily();
+				});
+
+				// Wire action button
+				$(this.bar).find('.offerwall-btn').on('click', () => {
+					if (!this.rewardedEvt) return;
+					$(this.bar).find('.offerwall-loading').show();
+					this.bar.style.display = "none";
+					this.rewardedEvt.makeRewardedVisible();
+				});
+			},
+
+			dismissTemporarily: function () {
+				this.bar.style.display = "none";
+				sessionStorage.setItem(this.sessionKey, 'true'); // sets session skip cap
+				window.removeEventListener('scroll', this.onScroll);
+			},
+
+			onScroll: function () {
+				if (sessionStorage.getItem(this.sessionKey) === 'true') return;
+
+				const st = window.scrollY || document.documentElement.scrollTop || 0;
+				const vh = window.innerHeight || 0;
+				const dh = Math.max(
+					document.documentElement.scrollHeight || 0,
+					document.body ? document.body.scrollHeight : 0
+				);
+				const maxScroll = Math.max(dh - vh, 1);
+				const currentPercent = (st + vh) / dh * 100;
+
+				const triggerPercent = this.config.triggerPercent || 60;
+
+				if (currentPercent >= triggerPercent) {
+					this.showOfferwall();
+				}
+			},
+
+			showOfferwall: function () {
+				this.bar.style.display = "block";
+				this.initRewardedSlot();
+			},
+
+			initRewardedSlot: function () {
+				if (this.adInitialized) return;
+				this.adInitialized = true;
+
+				window.googletag = window.googletag || { cmd: [] };
+				
+				// Helper checks for OutOfPage define slots
+				const checkAndRegister = () => {
+					googletag.cmd.push(() => {
+						try {
+							const slot = googletag.defineOutOfPageSlot(
+								this.config.networkCode,
+								googletag.enums.OutOfPageFormat.REWARDED
+							);
+
+							if (!slot) {
+								this.bar.style.display = "none";
+								return;
+							}
+
+							slot.addService(googletag.pubads());
+							
+							googletag.pubads().addEventListener('rewardedSlotReady', (evt) => {
+								this.rewardedEvt = evt;
+								const btn = $(this.bar).find('.offerwall-btn');
+								btn.prop('disabled', false).css({
+									'cursor': 'pointer',
+									'opacity': '1'
+								});
+							});
+
+							googletag.pubads().addEventListener('rewardedSlotGranted', () => {
+								sessionStorage.setItem(this.sessionKey, 'true');
+							});
+
+							googletag.pubads().addEventListener('rewardedSlotClosed', () => {
+								$(this.bar).find('.offerwall-loading').hide();
+								// Re-enable button after ad closes (in case user wants to view again)
+								const btn = $(this.bar).find('.offerwall-btn');
+								if (this.rewardedEvt) {
+									btn.prop('disabled', false).css({
+										'cursor': 'pointer',
+										'opacity': '1'
+									});
+								}
+							});
+
+							// Timeout: If ad doesn't load within 15 seconds, hide to keep UX clean
+							setTimeout(() => {
+								if (!this.rewardedEvt) {
+									this.bar.style.display = "none";
+								}
+							}, 15000);
+
+							googletag.enableServices();
+							googletag.display(slot);
+
+						} catch (e) {
+							console.error('[AdX Offerwall] GPT Registration error:', e);
+							this.bar.style.display = "none";
+						}
+					});
+				};
+
+				if (typeof googletag !== 'undefined' && typeof googletag.defineOutOfPageSlot !== 'undefined') {
+					checkAndRegister();
+				} else {
+					var attempts = 0;
+					const timer = setInterval(() => {
+						attempts++;
+						if (typeof googletag !== 'undefined' && typeof googletag.defineOutOfPageSlot !== 'undefined') {
+							clearInterval(timer);
+							checkAndRegister();
+						} else if (attempts >= 100) {
+							clearInterval(timer);
+							this.bar.style.display = "none";
+						}
+					}, 100);
+				}
+			}
+		};
+
+		offerwallModule.init();
 	});
 
 })(jQuery);

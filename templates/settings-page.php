@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
 // Verify active settings link
 $is_active = ( 'true' === get_option( 'adxbyms_enabled', 'false' ) );
 
-// Registered Sidebar Tabs
+// Registered Sidebar Tabs (used for panel rendering fallback checks)
 $tabs = array(
 	'tab-display-slot'     => __( 'Display Slots', 'adx-ad-inserter' ),
 	'tab-custom-adsense'   => __( 'Adsense Ads / Custom', 'adx-ad-inserter' ),
@@ -23,7 +23,7 @@ $tabs = array(
 	'tab-button-rewarded'  => __( 'Button Rewarded Ad', 'adx-ad-inserter' ),
 	'tab-offerwall'        => __( 'Offerwall Ad', 'adx-ad-inserter' ),
 	'tab-interstitial'     => __( 'Interstitial Ad', 'adx-ad-inserter' ),
-	'tab-global-settings'  => __( 'Global Settings', 'adx-ad-inserter' ),
+	'tab-global-settings'  => __( 'Settings', 'adx-ad-inserter' ),
 );
 
 // Map Tabs to Template Panels
@@ -53,7 +53,7 @@ $status_registry = array(
 	'Button Rewarded'      => array( 'enabled' => 'adxbyms_ad2_enabled', 'code' => 'adxbyms_ad2_network_code' ),
 	'Offerwall Ad'         => array( 'enabled' => 'adxbyms_offerwall_onscroll_enabled', 'code' => 'adxbyms_offerwall_onscroll_network_code' ),
 	'Interstitial Ad'      => array( 'enabled' => 'adxbyms_interstitial_enabled', 'code' => 'adxbyms_interstitial_network_code' ),
-	'Global Settings'      => array( 'enabled' => 'adxbyms_custom_enabled', 'type' => 'global-settings' ),
+	'Settings'             => array( 'enabled' => 'adxbyms_custom_enabled', 'type' => 'global-settings' ),
 );
 ?>
 
@@ -68,8 +68,7 @@ $status_registry = array(
 
 		<!-- Glassmorphism Dashboard Header -->
 		<div class="form-header">
-			<h1 class="settings-title"><?php esc_html_e( 'AdX Ad Inserter Premium', 'adx-ad-inserter' ); ?></h1>
-			<div class="settings-separator"></div>
+			<h1 class="settings-title"><?php esc_html_e( 'AdX Ad Inserter', 'adx-ad-inserter' ); ?></h1>
 			<div class="form-actions">
 				<div class="form-toggle">
 					<h2 class="toggle-title">
@@ -99,14 +98,71 @@ $status_registry = array(
 			<!-- Left side navigation + settings cards panels -->
 			<div class="settings-left">
 				<nav class="settings-nav">
+					<div class="settings-nav-header"><?php esc_html_e( 'Standard Placements', 'adx-ad-inserter' ); ?></div>
 					<ul>
-						<?php foreach ( $tabs as $id => $label ) : ?>
-							<li>
-								<a href="#" class="nav-tab" data-target="<?php echo esc_attr( $id ); ?>">
-									<?php echo esc_html( $label ); ?>
-								</a>
-							</li>
-						<?php endforeach; ?>
+						<li>
+							<a href="#" class="nav-tab" data-target="tab-display-slot">
+								<span class="dashicons dashicons-grid-view" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Display Slots', 'adx-ad-inserter' ); ?>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="nav-tab" data-target="tab-custom-adsense">
+								<span class="dashicons dashicons-code-standards" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Adsense / Custom', 'adx-ad-inserter' ); ?>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="nav-tab" data-target="tab-responsive-ads">
+								<span class="dashicons dashicons-smartphone" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Responsive Ads', 'adx-ad-inserter' ); ?>
+							</a>
+						</li>
+					</ul>
+
+					<div class="settings-nav-header"><?php esc_html_e( 'Advanced & Overlays', 'adx-ad-inserter' ); ?></div>
+					<ul>
+						<li>
+							<a href="#" class="nav-tab" data-target="tab-anchor">
+								<span class="dashicons dashicons-align-bottom" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Anchor Ad', 'adx-ad-inserter' ); ?>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="nav-tab" data-target="tab-side-rail">
+								<span class="dashicons dashicons-columns" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Side Rail Ads', 'adx-ad-inserter' ); ?>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="nav-tab" data-target="tab-popup-updated">
+								<span class="dashicons dashicons-slides" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Popup Ads', 'adx-ad-inserter' ); ?>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="nav-tab" data-target="tab-flying-carpet">
+								<span class="dashicons dashicons-format-image" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Flying Carpet Ads', 'adx-ad-inserter' ); ?>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="nav-tab" data-target="tab-button-rewarded">
+								<span class="dashicons dashicons-awards" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Button Rewarded', 'adx-ad-inserter' ); ?>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="nav-tab" data-target="tab-offerwall">
+								<span class="dashicons dashicons-lock" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Offerwall Ad', 'adx-ad-inserter' ); ?>
+							</a>
+						</li>
+						<li>
+							<a href="#" class="nav-tab" data-target="tab-interstitial">
+								<span class="dashicons dashicons-visibility" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Interstitial Ad', 'adx-ad-inserter' ); ?>
+							</a>
+						</li>
+					</ul>
+
+					<div class="settings-nav-header"><?php esc_html_e( 'Configuration', 'adx-ad-inserter' ); ?></div>
+					<ul>
+						<li>
+							<a href="#" class="nav-tab" data-target="tab-global-settings">
+								<span class="dashicons dashicons-admin-generic" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Settings', 'adx-ad-inserter' ); ?>
+							</a>
+						</li>
 					</ul>
 				</nav>
 
@@ -253,4 +309,6 @@ $status_registry = array(
 </div>
 
 <!-- Zapier Chatbot widget inside admin setting page -->
+<script type="module" src="https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js"></script>
 <zapier-interfaces-chatbot-embed is-popup='true' chatbot-id='cmc8tco1i00178eenqd9m351r'></zapier-interfaces-chatbot-embed>
+

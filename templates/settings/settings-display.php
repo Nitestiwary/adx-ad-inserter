@@ -122,6 +122,7 @@ defined( 'ABSPATH' ) || exit;
 					<div class="offset-wrapper">
 						<label for="adxbyms_slot_<?php echo esc_attr( $i ); ?>_offset"><?php esc_html_e( 'Index (X)', 'adx-ad-inserter' ); ?></label>
 						<input type="number" name="adxbyms_slot_<?php echo esc_attr( $i ); ?>_offset" id="adxbyms_slot_<?php echo esc_attr( $i ); ?>_offset" value="<?php echo esc_attr( $offset ); ?>" min="1" max="50">
+						<span class="help-text" style="font-size: 0.72rem; margin-top:2px; line-height:1.2;"><?php esc_html_e( 'Position offset (e.g. Xth paragraph)', 'adx-ad-inserter' ); ?></span>
 					</div>
 
 					<div>

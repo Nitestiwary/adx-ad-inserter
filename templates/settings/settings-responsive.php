@@ -33,7 +33,7 @@ defined( 'ABSPATH' ) || exit;
 				$badge_class = $sub_enabled ? 'tab-green' : 'tab-red';
 			}
 			?>
-			<div class="responsive-tab display-tab <?php echo esc_attr( $badge_class ); ?>" style="padding: 10px 18px;">
+			<div class="responsive-tab <?php echo esc_attr( $badge_class ); ?>" style="padding: 10px 18px;">
 				<?php printf( esc_html__( 'Responsive Ad %d', 'adx-ad-inserter' ), (int) $i ); ?>
 			</div>
 		<?php endfor; ?>
@@ -50,7 +50,7 @@ defined( 'ABSPATH' ) || exit;
 			$alignment  = get_option( "adxbyms_responsive_block_{$i}_alignment", 'center' );
 			$devices    = (array) get_option( "adxbyms_responsive_block_{$i}_devices", array( 'desktop', 'mobile' ) );
 			?>
-			<div class="responsive-content display-content">
+			<div class="responsive-content">
 				<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
 					<h3 style="margin:0 !important; font-size:1.2rem; font-weight:700;">
 						<?php printf( esc_html__( 'Responsive Ad Block %d Options', 'adx-ad-inserter' ), (int) $i ); ?>
@@ -90,6 +90,7 @@ defined( 'ABSPATH' ) || exit;
 					<div class="offset-wrapper">
 						<label for="adxbyms_responsive_block_<?php echo esc_attr( $i ); ?>_offset"><?php esc_html_e( 'Index (X)', 'adx-ad-inserter' ); ?></label>
 						<input type="number" name="adxbyms_responsive_block_<?php echo esc_attr( $i ); ?>_offset" id="adxbyms_responsive_block_<?php echo esc_attr( $i ); ?>_offset" value="<?php echo esc_attr( $offset ); ?>" min="1" max="50">
+						<span class="help-text" style="font-size: 0.72rem; margin-top:2px; line-height:1.2;"><?php esc_html_e( 'Position offset (e.g. Xth paragraph)', 'adx-ad-inserter' ); ?></span>
 					</div>
 
 					<div>

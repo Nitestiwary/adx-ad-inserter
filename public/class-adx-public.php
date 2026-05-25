@@ -76,6 +76,26 @@ class Adx_Public {
 				'frequency'      => esc_js( $popup_freq ),
 			)
 		);
+
+		// Localize offerwall settings
+		$offerwall_enabled = ( 'true' === get_option( 'adxbyms_offerwall_onscroll_enabled', 'false' ) );
+		$offerwall_code    = get_option( 'adxbyms_offerwall_onscroll_network_code', '' );
+		$offerwall_logo    = get_option( 'adxbyms_offerwall_onscroll_logo_url', '' );
+
+		if ( empty( $offerwall_logo ) ) {
+			$offerwall_logo = plugin_dir_url( ADXBYMS_FILE ) . 'assets/img/company_logo.png';
+		}
+
+		wp_localize_script(
+			'adxbyms-public-js',
+			'ADXBYMS_OFFERWALL_DATA',
+			array(
+				'enabled'        => $offerwall_enabled && ! empty( $offerwall_code ),
+				'networkCode'    => esc_js( $offerwall_code ),
+				'logoUrl'        => esc_url( $offerwall_logo ),
+				'triggerPercent' => 60,
+			)
+		);
 	}
 
 	/**

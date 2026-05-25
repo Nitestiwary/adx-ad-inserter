@@ -57,42 +57,30 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	// --- 2. Subtab Horizontal Switching (e.g. Display Ad Blocks, Responsive Blocks, etc.) ---
+	// --- 2. Subtab Horizontal Switching (Scoped per parent tab to prevent leakage) ---
 	function setupSubtabs(tabClass, contentClass) {
-		const tabContainers = document.querySelectorAll(tabClass).forEach(tab => {
-			tab.addEventListener('click', function () {
-				const parent = tab.closest('.adx-tab');
-				if (!parent) return;
+		document.querySelectorAll('.adx-tab').forEach(parentTab => {
+			const siblingTabs = parentTab.querySelectorAll(tabClass);
+			const siblingContents = parentTab.querySelectorAll(contentClass);
+			if (siblingTabs.length === 0) return;
 
-				const siblingTabs = parent.querySelectorAll(tabClass);
-				const siblingContents = parent.querySelectorAll(contentClass);
+			siblingTabs.forEach((tab, index) => {
+				tab.addEventListener('click', function () {
+					// Deactivate siblings within this parent only
+					siblingTabs.forEach(t => t.classList.remove('active'));
+					siblingContents.forEach(c => c.classList.remove('active'));
 
-				// Find index of clicked tab
-				let index = 0;
-				for (let i = 0; i < siblingTabs.length; i++) {
-					if (siblingTabs[i] === tab) {
-						index = i;
-						break;
+					// Activate selected
+					tab.classList.add('active');
+					if (siblingContents[index]) {
+						siblingContents[index].classList.add('active');
 					}
-				}
-
-				// Deactivate siblings
-				siblingTabs.forEach(t => t.classList.remove('active'));
-				siblingContents.forEach(c => c.classList.remove('active'));
-
-				// Activate current
-				tab.classList.add('active');
-				if (siblingContents[index]) {
-					siblingContents[index].classList.add('active');
-				}
+				});
 			});
-		});
 
-		// Trigger click on first subtab for each section on load
-		document.querySelectorAll('.adx-tab').forEach(section => {
-			const firstTab = section.querySelector(tabClass);
-			if (firstTab) {
-				firstTab.click();
+			// Trigger click on first subtab for this section on load
+			if (siblingTabs[0]) {
+				siblingTabs[0].click();
 			}
 		});
 	}
@@ -103,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	setupSubtabs('.global-tab', '.global-content');
 
 
-	// --- 3. Collapsible Card Toggle (for Adsense Ads / Custom) ---
+	// --- 3. Collapsible Card Toggle (for Adsense / Settings / etc.) ---
 	const cardHeaders = document.querySelectorAll('.card-header');
 	cardHeaders.forEach(header => {
 		header.addEventListener('click', function () {
@@ -125,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	});
 
-	// --- 4. Offset Input Display Toggle based on Insertion Selectors ---
+	// --- 4. Offset Input Display Toggle (Dynamic Dimming and Disabling) ---
 	const insertionSelectors = document.querySelectorAll('select[id$="_insertion"]');
 	
 	function toggleOffsetField(selectElement) {
@@ -139,11 +127,21 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (!offsetWrapper) return;
 
 		const value = selectElement.value;
-		// Show offset for specific paragraph, image, heading, or carpet selectors
+		const inputField = offsetWrapper.querySelector('input[type="number"]');
+
+		// Show/Enable offset for specific paragraph, image, heading, or carpet selectors
 		if (['before_paragraph', 'after_paragraph', 'before_image', 'after_image', 'before_heading', 'after_paragraph_x'].includes(value)) {
-			offsetWrapper.style.display = 'flex';
+			offsetWrapper.classList.remove('disabled');
+			if (inputField) {
+				inputField.disabled = false;
+				inputField.style.cursor = 'text';
+			}
 		} else {
-			offsetWrapper.style.display = 'none';
+			offsetWrapper.classList.add('disabled');
+			if (inputField) {
+				inputField.disabled = true;
+				inputField.style.cursor = 'not-allowed';
+			}
 		}
 	}
 
