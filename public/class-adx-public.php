@@ -1,0 +1,792 @@
+<?php
+/**
+ * Frontend Public Area Controller
+ *
+ * @package    AdX-Ad-Inserter
+ * @subpackage Public
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+class Adx_Public {
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		// Enqueue scripts and styles
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_public_assets' ) );
+
+		// Register shortcodes
+		add_shortcode( 'ms_display_ad', array( $this, 'render_display_ad_shortcode' ) );
+		add_shortcode( 'ms_custom_ad', array( $this, 'render_custom_ad_shortcode' ) );
+		add_shortcode( 'ms_responsive_ad', array( $this, 'render_responsive_ad_shortcode' ) );
+		add_shortcode( 'ms_flying_carpet', array( $this, 'render_flying_carpet_shortcode' ) );
+		add_shortcode( 'ms_side_rail', array( $this, 'render_side_rail_shortcode' ) );
+
+		// Core hooks for automatic ad insertion
+		add_filter( 'the_content', array( $this, 'inject_in_content_ads' ), 99 );
+		add_action( 'loop_start', array( $this, 'inject_before_post_ads' ) );
+		add_action( 'loop_end', array( $this, 'inject_after_post_ads' ) );
+		
+		// Header/Footer injections
+		add_action( 'wp_head', array( $this, 'inject_header_ads' ) );
+		add_action( 'wp_footer', array( $this, 'inject_footer_ads' ) );
+
+		// Ads.txt Rewrite and Query Variables
+		add_filter( 'query_vars', array( $this, 'register_ads_txt_query_var' ) );
+		add_action( 'template_redirect', array( $this, 'serve_ads_txt' ), 0 );
+	}
+
+
+	/**
+	 * Register & Enqueue public CSS/JS assets.
+	 */
+	public function enqueue_public_assets() {
+		if ( Adx_Exclusions::is_current_page_excluded() ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'adxbyms-public-css',
+			ADXBYMS_URL_MODULAR . 'assets/css/public.css',
+			array(),
+			ADXBYMS_VERSION
+		);
+
+		wp_enqueue_script(
+			'adxbyms-public-js',
+			ADXBYMS_URL_MODULAR . 'assets/js/public.js',
+			array( 'jquery' ),
+			ADXBYMS_VERSION,
+			true
+		);
+
+		// Localize popup settings
+		$popup_freq = get_option( 'adxbyms_popup_frequency', 'session' );
+		$popup_sec  = absint( get_option( 'adxbyms_popup_scroll_trigger', 60 ) ) / 100;
+		$popup_code = get_option( 'adxbyms_popup_network_code', '' );
+
+		wp_localize_script(
+			'adxbyms-public-js',
+			'ADXBYMS_POPUP_DATA',
+			array(
+				'network_code'   => esc_js( $popup_code ),
+				'scroll_trigger' => (float) $popup_sec,
+				'frequency'      => esc_js( $popup_freq ),
+			)
+		);
+	}
+
+	/**
+	 * check whether ads can render based on current context (exclusion, global status).
+	 *
+	 * @return bool
+	 */
+	private function can_render_ads() {
+		if ( 'true' !== get_option( 'adxbyms_enabled', 'false' ) ) {
+			return false;
+		}
+		if ( is_admin() ) {
+			return false;
+		}
+		if ( Adx_Exclusions::is_current_page_excluded() ) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Check if page types filter matches the current page.
+	 */
+	private function check_page_types( $pages ) {
+		if ( empty( $pages ) ) {
+			return true;
+		}
+		
+		foreach ( (array) $pages as $page ) {
+			switch ( $page ) {
+				case 'all':
+				case 'entire_website':
+					return true;
+				case 'post':
+					if ( is_single() ) {
+						return true;
+					}
+					break;
+				case 'homepage':
+					if ( is_front_page() || is_home() ) {
+						return true;
+					}
+					break;
+				case 'category':
+					if ( is_category() ) {
+						return true;
+					}
+					break;
+				case 'static':
+					if ( is_page() ) {
+						return true;
+					}
+					break;
+				case 'search':
+					if ( is_search() ) {
+						return true;
+					}
+					break;
+				case 'tag':
+					if ( is_tag() ) {
+						return true;
+					}
+					break;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Auto Inject Ads In Content.
+	 */
+	public function inject_in_content_ads( $content ) {
+		if ( ! $this->can_render_ads() || empty( $content ) || ! is_string( $content ) ) {
+			return $content;
+		}
+
+		// 1. standard Display Ads (In-content slots)
+		if ( 'true' === get_option( 'adxbyms_slot_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 10; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_slot_{$i}_enabled" ) );
+				$network   = get_option( "adxbyms_slot_{$i}_network_code", '' );
+				$sizes     = (array) get_option( "adxbyms_slot_{$i}_sizes", array() );
+				$insertion = get_option( "adxbyms_slot_{$i}_insertion", '' );
+				$offset    = absint( get_option( "adxbyms_slot_{$i}_offset", 1 ) );
+				$alignment = get_option( "adxbyms_slot_{$i}_alignment", 'center' );
+				$pages     = (array) get_option( "adxbyms_slot_{$i}_pages", array() );
+				$devices   = (array) get_option( "adxbyms_slot_{$i}_devices", array() );
+
+				if ( ! $enabled || empty( $network ) || empty( $sizes ) ) {
+					continue;
+				}
+
+				// Skip before/after hooks inside content filter
+				if ( 'before_post' === $insertion || 'after_post' === $insertion || 'manual' === $insertion ) {
+					continue;
+				}
+
+				if ( ! $this->check_page_types( $pages ) || ! Adx_Device::matches( $devices ) ) {
+					continue;
+				}
+
+				$div_id  = 'div-gpt-ad-slot-' . $i . '-' . uniqid();
+				$ad_html = Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment );
+				$content = Adx_Content_Inserter::insert( $content, $ad_html, $insertion, $offset );
+			}
+		}
+
+		// 2. Adsense Ads / Custom (Feature 1)
+		if ( 'true' === get_option( 'adxbyms_custom_adsense_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 10; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_custom_adsense_block_{$i}_enabled" ) );
+				$code      = get_option( "adxbyms_custom_adsense_block_{$i}_code", '' );
+				$insertion = get_option( "adxbyms_custom_adsense_block_{$i}_insertion", '' );
+				$offset    = absint( get_option( "adxbyms_custom_adsense_block_{$i}_offset", 1 ) );
+				$alignment = get_option( "adxbyms_custom_adsense_block_{$i}_alignment", 'center' );
+				$devices   = (array) get_option( "adxbyms_custom_adsense_block_{$i}_devices", array() );
+
+				if ( ! $enabled || empty( $code ) || 'manual' === $insertion || 'sticky_bottom' === $insertion ) {
+					continue;
+				}
+
+				if ( ! Adx_Device::matches( $devices ) ) {
+					continue;
+				}
+
+				// Render code
+				$ad_html = $this->build_custom_html_container( wp_unslash( $code ), $alignment );
+				$content = Adx_Content_Inserter::insert( $content, $ad_html, $insertion, $offset );
+			}
+		}
+
+		// 3. Responsive Ads (Feature 3)
+		if ( 'true' === get_option( 'adxbyms_responsive_ads_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 5; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_responsive_block_{$i}_enabled" ) );
+				$network   = get_option( "adxbyms_responsive_block_{$i}_network_code", '' );
+				$insertion = get_option( "adxbyms_responsive_block_{$i}_insertion", '' );
+				$offset    = absint( get_option( "adxbyms_responsive_block_{$i}_offset", 1 ) );
+				$alignment = get_option( "adxbyms_responsive_block_{$i}_alignment", 'center' );
+				$devices   = (array) get_option( "adxbyms_responsive_block_{$i}_devices", array() );
+
+				if ( ! $enabled || empty( $network ) || 'manual' === $insertion ) {
+					continue;
+				}
+
+				if ( ! Adx_Device::matches( $devices ) ) {
+					continue;
+				}
+
+				$ad_html = $this->build_responsive_gpt_ad( $network, $i, $alignment );
+				$content = Adx_Content_Inserter::insert( $content, $ad_html, $insertion, $offset );
+			}
+		}
+
+		// 4. Flying Carpet Ads (Feature 5)
+		if ( 'true' === get_option( 'adxbyms_flying_carpet_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 5; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_flying_carpet_block_{$i}_enabled" ) );
+				$network   = get_option( "adxbyms_flying_carpet_block_{$i}_network_code", '' );
+				$insertion = get_option( "adxbyms_flying_carpet_block_{$i}_insertion", '' );
+				$offset    = absint( get_option( "adxbyms_flying_carpet_block_{$i}_offset", 1 ) );
+				$alignment = get_option( "adxbyms_flying_carpet_block_{$i}_alignment", 'center' );
+				$devices   = (array) get_option( "adxbyms_flying_carpet_block_{$i}_devices", array() );
+
+				if ( ! $enabled || empty( $network ) || 'manual' === $insertion ) {
+					continue;
+				}
+
+				if ( ! Adx_Device::matches( $devices ) ) {
+					continue;
+				}
+
+				$ad_html = $this->build_flying_carpet_ad( $network, $i, $alignment );
+				$content = Adx_Content_Inserter::insert( $content, $ad_html, $insertion, $offset );
+			}
+		}
+
+		return $content;
+	}
+
+	/**
+	 * Hook-based insertion: Before Post.
+	 */
+	public function inject_before_post_ads() {
+		if ( ! $this->can_render_ads() ) {
+			return;
+		}
+		if ( 'true' !== get_option( 'adxbyms_slot_enabled', 'false' ) ) {
+			return;
+		}
+
+		for ( $i = 1; $i <= 10; $i++ ) {
+			$enabled   = ( 'true' === get_option( "adxbyms_slot_{$i}_enabled" ) );
+			$network   = get_option( "adxbyms_slot_{$i}_network_code", '' );
+			$sizes     = (array) get_option( "adxbyms_slot_{$i}_sizes", array() );
+			$insertion = get_option( "adxbyms_slot_{$i}_insertion", '' );
+			$alignment = get_option( "adxbyms_slot_{$i}_alignment", 'center' );
+			$pages     = (array) get_option( "adxbyms_slot_{$i}_pages", array() );
+			$devices   = (array) get_option( "adxbyms_slot_{$i}_devices", array() );
+
+			if ( ! $enabled || empty( $network ) || empty( $sizes ) || 'before_post' !== $insertion ) {
+				continue;
+			}
+
+			if ( ! $this->check_page_types( $pages ) || ! Adx_Device::matches( $devices ) ) {
+				continue;
+			}
+
+			$div_id  = 'div-gpt-ad-slot-before-' . $i;
+			echo Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+	}
+
+	/**
+	 * Hook-based insertion: After Post.
+	 */
+	public function inject_after_post_ads() {
+		if ( ! $this->can_render_ads() ) {
+			return;
+		}
+		if ( 'true' !== get_option( 'adxbyms_slot_enabled', 'false' ) ) {
+			return;
+		}
+
+		for ( $i = 1; $i <= 10; $i++ ) {
+			$enabled   = ( 'true' === get_option( "adxbyms_slot_{$i}_enabled" ) );
+			$network   = get_option( "adxbyms_slot_{$i}_network_code", '' );
+			$sizes     = (array) get_option( "adxbyms_slot_{$i}_sizes", array() );
+			$insertion = get_option( "adxbyms_slot_{$i}_insertion", '' );
+			$alignment = get_option( "adxbyms_slot_{$i}_alignment", 'center' );
+			$pages     = (array) get_option( "adxbyms_slot_{$i}_pages", array() );
+			$devices   = (array) get_option( "adxbyms_slot_{$i}_devices", array() );
+
+			if ( ! $enabled || empty( $network ) || empty( $sizes ) || 'after_post' !== $insertion ) {
+				continue;
+			}
+
+			if ( ! $this->check_page_types( $pages ) || ! Adx_Device::matches( $devices ) ) {
+				continue;
+			}
+
+			$div_id  = 'div-gpt-ad-slot-after-' . $i;
+			echo Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+	}
+
+	/**
+	 * Render Custom Alignment Div.
+	 */
+	private function build_custom_html_container( $html_code, $alignment ) {
+		$alignment = in_array( $alignment, array( 'left', 'center', 'right', 'full' ), true ) ? $alignment : 'center';
+		$style = 'display:table;margin:12px 0;text-align:left;';
+		if ( 'center' === $alignment ) {
+			$style = 'display:table;margin:12px auto;text-align:center;';
+		} elseif ( 'right' === $alignment ) {
+			$style = 'display:table;margin:12px 0 12px auto;text-align:right;';
+		} elseif ( 'full' === $alignment ) {
+			$style = 'display:block;width:100%;margin:12px 0;text-align:center;';
+		}
+
+		return '<div class="adxbyms-custom-container adx-align-' . esc_attr( $alignment ) . '" style="' . esc_attr( $style ) . '">' . $html_code . '</div>';
+	}
+
+	/**
+	 * Build responsive size mapping for Feature 3.
+	 */
+	private function build_responsive_gpt_ad( $network, $index, $alignment ) {
+		$div_id = 'ms-responsive-ad-' . $index;
+		
+		// Auto-generate standard map size mapping JS
+		$mapping_js = 'googletag.sizeMapping()
+			.addSize([800, 90], [728, 90])
+			.addSize([0, 0], [300, 250])
+			.build()';
+
+		// GAM maps both size categories
+		$sizes = array( '728x90', '300x250' );
+
+		return Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment, $mapping_js );
+	}
+
+	/**
+	 * Build Flying Carpet parallax ad for Feature 5.
+	 */
+	private function build_flying_carpet_ad( $network, $index, $alignment ) {
+		$div_id = 'ms-flying-carpet-' . $index;
+		$site_host = wp_parse_url( get_site_url(), PHP_URL_HOST );
+		
+		// Page URL dynamic replacements (Feature 5 Requirement)
+		$current_url = home_url( add_query_arg( null, null ) );
+
+		ob_start();
+		?>
+		<div class="ms-flying-carpet-wrapper adx-align-<?php echo esc_attr( $alignment ); ?>">
+			<div class="ms-flying-carpet-container">
+				<div class="ms-flying-carpet-parallax">
+					<div id="<?php echo esc_attr( $div_id ); ?>" class="ms-flying-carpet-slot"></div>
+				</div>
+			</div>
+			
+			<script type="text/javascript">
+				window.googletag = window.googletag || { cmd: [] };
+				window.googletag.cmd.push(function() {
+					try {
+						var slot = googletag.defineSlot('<?php echo esc_js( $network ); ?>', [[300, 250], [300, 600]], '<?php echo esc_js( $div_id ); ?>')
+							.addService(googletag.pubads());
+						
+						googletag.pubads().set('page_url', '<?php echo esc_js( $current_url ); ?>');
+						googletag.enableServices();
+						googletag.display('<?php echo esc_js( $div_id ); ?>');
+					} catch(e) {
+						console.error("[AdX Carpet] GPT Carpet registration error:", e);
+					}
+				});
+			</script>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Side Rails render in body for Feature 6.
+	 */
+	public function render_side_rails() {
+		if ( ! $this->can_render_ads() ) {
+			return;
+		}
+
+		if ( 'true' !== get_option( 'adxbyms_side_rail_enabled', 'false' ) ) {
+			return;
+		}
+
+		if ( wp_is_mobile() ) {
+			return; // Desktop only screens (>1200px)
+		}
+
+		$network = get_option( 'adxbyms_side_rail_network_code', '' );
+		if ( empty( $network ) ) {
+			return;
+		}
+
+		$refresh_enabled  = ( 'true' === get_option( 'adxbyms_side_rail_refresh_enabled', 'false' ) );
+		$refresh_interval = max( 30, absint( get_option( 'adxbyms_side_rail_refresh_interval', 30 ) ) );
+
+		// Render Left and Right Rails containers
+		?>
+		<div id="ms-side-rail-left" class="ms-side-rail-container">
+			<button class="ms-side-rail-close" aria-label="Close left advertisement" onclick="document.getElementById('ms-side-rail-left').style.display='none';">×</button>
+			<div id="ms-side-rail-left-slot" class="ms-side-rail-slot"></div>
+		</div>
+
+		<div id="ms-side-rail-right" class="ms-side-rail-container">
+			<button class="ms-side-rail-close" aria-label="Close right advertisement" onclick="document.getElementById('ms-side-rail-right').style.display='none';">×</button>
+			<div id="ms-side-rail-right-slot" class="ms-side-rail-slot"></div>
+		</div>
+
+		<script type="text/javascript">
+			window.googletag = window.googletag || { cmd: [] };
+			window.googletag.cmd.push(function() {
+				try {
+					// Register slots
+					var leftSlot = googletag.defineSlot('<?php echo esc_js( $network ); ?>', [[120, 600], [160, 600]], 'ms-side-rail-left-slot')
+						.addService(googletag.pubads());
+
+					var rightSlot = googletag.defineSlot('<?php echo esc_js( $network ); ?>', [[120, 600], [160, 600]], 'ms-side-rail-right-slot')
+						.addService(googletag.pubads());
+					
+					googletag.enableServices();
+					googletag.display('ms-side-rail-left-slot');
+					googletag.display('ms-side-rail-right-slot');
+
+					<?php if ( $refresh_enabled ) : ?>
+					// Viewability-based refreshing (Feature 6 requirement)
+					var lastRefresh = Date.now();
+					var refreshInterval = <?php echo (int) $refresh_interval; ?> * 1000;
+
+					window.addEventListener('scroll', function() {
+						if (Date.now() - lastRefresh > refreshInterval) {
+							// Simple viewability calculation
+							var leftEl = document.getElementById('ms-side-rail-left-slot');
+							if (leftEl && leftEl.getBoundingClientRect().top < window.innerHeight && leftEl.getBoundingClientRect().bottom > 0) {
+								googletag.pubads().refresh([leftSlot, rightSlot]);
+								lastRefresh = Date.now();
+								console.log("[AdX Rails] Refreshed visible side rails");
+							}
+						}
+					}, { passive: true });
+					<?php endif; ?>
+
+				} catch(e) {
+					console.error("[AdX Rails] GPT Side Rails error:", e);
+				}
+			});
+		</script>
+		<?php
+	}
+
+	/**
+	 * Inject Header Ads (wp_head).
+	 */
+	public function inject_header_ads() {
+		if ( ! $this->can_render_ads() ) {
+			return;
+		}
+
+		// 1. Legacy Anchor Ads
+		if ( 'true' === get_option( 'adxbyms_anchor_enabled', 'false' ) ) {
+			$anchor_code = get_option( 'adxbyms_anchor_network_code', '' );
+			$anchor_pos  = get_option( 'adxbyms_anchor_position', 'TOP_ANCHOR' );
+			
+			if ( ! empty( $anchor_code ) ) {
+				?>
+				<script type="text/javascript">
+					window.googletag = window.googletag || { cmd: [] };
+					googletag.cmd.push(function() {
+						try {
+							var posKey = '<?php echo esc_js( $anchor_pos ); ?>';
+							var fmt = (googletag.enums && googletag.enums.OutOfPageFormat) ? googletag.enums.OutOfPageFormat[posKey] : null;
+							if (fmt) {
+								var slot = googletag.defineOutOfPageSlot('<?php echo esc_js( $anchor_code ); ?>', fmt);
+								if (slot) {
+									slot.addService(googletag.pubads());
+									googletag.enableServices();
+									googletag.display(slot);
+								}
+							}
+						} catch(e) {}
+					});
+				</script>
+				<?php
+			}
+		}
+
+		// 2. Custom header scripts
+		if ( 'true' === get_option( 'adxbyms_custom_enabled', 'false' ) ) {
+			$header_code = get_option( 'adxbyms_header_code', '' );
+			if ( ! empty( $header_code ) ) {
+				echo wp_unslash( $header_code ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			}
+		}
+	}
+
+	/**
+	 * Inject Footer Ads (wp_footer).
+	 */
+	public function inject_footer_ads() {
+		if ( ! $this->can_render_ads() ) {
+			return;
+		}
+
+		// 1. Popup script configuration & overlay div (Feature 4 Update)
+		if ( 'true' === get_option( 'adxbyms_popup_enabled', 'false' ) ) {
+			$popup_devices = get_option( 'adxbyms_popup_devices', 'all' );
+			$popup_pages   = (array) get_option( 'adxbyms_popup_pages', array( 'all' ) );
+
+			// Check targets
+			if ( Adx_Device::matches( $popup_devices ) && $this->check_page_types( $popup_pages ) ) {
+				?>
+				<div id="adxbyms-popup-overlay" class="adxbyms-popup-overlay-container" style="display:none;">
+					<div class="adxbyms-popup-content-box">
+						<div class="adxbyms-popup-topbar">
+							<button type="button" class="adxbyms-popup-close-btn" aria-label="Close overlay advertisement">×</button>
+						</div>
+						<div id="adxbyms-popup-slot-div" class="adxbyms-popup-ad-slot"></div>
+					</div>
+				</div>
+				<?php
+			}
+		}
+
+		// 2. Side Rails insertion
+		$this->render_side_rails();
+
+		// 3. Custom Adsense / Sticky Bottom Ads (Feature 1)
+		if ( 'true' === get_option( 'adxbyms_custom_adsense_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 10; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_custom_adsense_block_{$i}_enabled" ) );
+				$code      = get_option( "adxbyms_custom_adsense_block_{$i}_code", '' );
+				$insertion = get_option( "adxbyms_custom_adsense_block_{$i}_insertion", '' );
+				$devices   = (array) get_option( "adxbyms_custom_adsense_block_{$i}_devices", array() );
+
+				if ( ! $enabled || empty( $code ) || 'sticky_bottom' !== $insertion ) {
+					continue;
+				}
+
+				if ( ! Adx_Device::matches( $devices ) ) {
+					continue;
+				}
+
+				?>
+				<div class="adxbyms-sticky-bottom-bar">
+					<button class="adxbyms-sticky-close" onclick="this.closest('.adxbyms-sticky-bottom-bar').remove();" aria-label="Close bottom advertisement">×</button>
+					<div class="adxbyms-sticky-content">
+						<?php echo wp_unslash( $code ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					</div>
+				</div>
+				<?php
+			}
+		}
+
+		// 4. Custom footer scripts
+		if ( 'true' === get_option( 'adxbyms_custom_enabled', 'false' ) ) {
+			$footer_code = get_option( 'adxbyms_footer_code', '' );
+			if ( ! empty( $footer_code ) ) {
+				echo wp_unslash( $footer_code ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			}
+		}
+	}
+
+	/**
+	 * Shortcodes rendering callbacks.
+	 */
+	public function render_display_ad_shortcode( $atts ) {
+		if ( ! $this->can_render_ads() ) {
+			return '';
+		}
+
+		$args = shortcode_atts( array( 'id' => '' ), $atts );
+		$id   = absint( $args['id'] );
+
+		if ( $id < 1 || $id > 10 ) {
+			return '';
+		}
+
+		$enabled = ( 'true' === get_option( "adxbyms_slot_{$id}_enabled" ) );
+		$network = get_option( "adxbyms_slot_{$id}_network_code", '' );
+		$sizes   = (array) get_option( "adxbyms_slot_{$id}_sizes", array() );
+		$align   = get_option( "adxbyms_slot_{$id}_alignment", 'center' );
+
+		if ( ! $enabled || empty( $network ) || empty( $sizes ) ) {
+			return '';
+		}
+
+		$div_id = 'ms-display-ad-sc-' . $id . '-' . uniqid();
+		return Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $align );
+	}
+
+	public function render_custom_ad_shortcode( $atts ) {
+		if ( ! $this->can_render_ads() ) {
+			return '';
+		}
+
+		$args = shortcode_atts( array( 'id' => '' ), $atts );
+		$id   = absint( $args['id'] );
+
+		if ( $id < 1 || $id > 10 ) {
+			return '';
+		}
+
+		$enabled   = ( 'true' === get_option( "adxbyms_custom_adsense_block_{$id}_enabled" ) );
+		$code      = get_option( "adxbyms_custom_adsense_block_{$id}_code", '' );
+		$align     = get_option( "adxbyms_custom_adsense_block_{$id}_alignment", 'center' );
+		$devices   = (array) get_option( "adxbyms_custom_adsense_block_{$id}_devices", array() );
+
+		if ( ! $enabled || empty( $code ) ) {
+			return '';
+		}
+
+		if ( ! Adx_Device::matches( $devices ) ) {
+			return '';
+		}
+
+		return $this->build_custom_html_container( wp_unslash( $code ), $align );
+	}
+
+	public function render_responsive_ad_shortcode( $atts ) {
+		if ( ! $this->can_render_ads() ) {
+			return '';
+		}
+
+		$args = shortcode_atts( array( 'id' => '' ), $atts );
+		$id   = absint( $args['id'] );
+
+		if ( $id < 1 || $id > 5 ) {
+			return '';
+		}
+
+		$enabled   = ( 'true' === get_option( "adxbyms_responsive_block_{$id}_enabled" ) );
+		$network   = get_option( "adxbyms_responsive_block_{$id}_network_code", '' );
+		$align     = get_option( "adxbyms_responsive_block_{$id}_alignment", 'center' );
+		$devices   = (array) get_option( "adxbyms_responsive_block_{$id}_devices", array() );
+
+		if ( ! $enabled || empty( $network ) ) {
+			return '';
+		}
+
+		if ( ! Adx_Device::matches( $devices ) ) {
+			return '';
+		}
+
+		return $this->build_responsive_gpt_ad( $network, $id, $align );
+	}
+
+	public function render_flying_carpet_shortcode( $atts ) {
+		if ( ! $this->can_render_ads() ) {
+			return '';
+		}
+
+		$args = shortcode_atts( array( 'id' => '' ), $atts );
+		$id   = absint( $args['id'] );
+
+		if ( $id < 1 || $id > 5 ) {
+			return '';
+		}
+
+		$enabled   = ( 'true' === get_option( "adxbyms_flying_carpet_block_{$id}_enabled" ) );
+		$network   = get_option( "adxbyms_flying_carpet_block_{$id}_network_code", '' );
+		$align     = get_option( "adxbyms_flying_carpet_block_{$id}_alignment", 'center' );
+		$devices   = (array) get_option( "adxbyms_flying_carpet_block_{$id}_devices", array() );
+
+		if ( ! $enabled || empty( $network ) ) {
+			return '';
+		}
+
+		if ( ! Adx_Device::matches( $devices ) ) {
+			return '';
+		}
+
+		return $this->build_flying_carpet_ad( $network, $id, $align );
+	}
+
+	public function render_side_rail_shortcode() {
+		// Side rails render inside wp_footer so shortcode is just a placeholder trigger
+		ob_start();
+		$this->render_side_rails();
+		return ob_get_clean();
+	}
+
+	/**
+	 * Register ads.txt query var.
+	 */
+	public function register_ads_txt_query_var( $vars ) {
+		$vars[] = 'adxbyms_ads_txt';
+		return $vars;
+	}
+
+	/**
+	 * Serve ads.txt dynamically.
+	 */
+	public function serve_ads_txt() {
+		if ( is_admin() ) {
+			return;
+		}
+
+		$request_uri_raw = filter_input( INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL );
+		if ( false === $request_uri_raw ) {
+			$request_uri_raw = '';
+		}
+		$request_uri = sanitize_text_field( wp_unslash( $request_uri_raw ) );
+		$path        = strtolower( strtok( $request_uri, '?' ) );
+
+		// 1. Redirect /index.php/ads.txt to /ads.txt
+		if ( '/index.php/ads.txt' === $path ) {
+			wp_safe_redirect( home_url( '/ads.txt' ), 301 );
+			exit;
+		}
+
+		// 2. Redirect /ads.txt/ to /ads.txt.
+		if ( '/ads.txt/' === $path ) {
+			wp_safe_redirect( home_url( '/ads.txt' ), 301 );
+			exit;
+		}
+
+		$is_ads_rewrite = get_query_var( 'adxbyms_ads_txt' );
+		$is_index_ads   = ( '/index.php/ads.txt' === $path );
+		if ( ! $is_ads_rewrite && ! $is_index_ads ) {
+			return;
+		}
+
+		$enabled = get_option( 'adxbyms_ads_txt_enabled', 'false' );
+		$code    = (string) get_option( 'adxbyms_ads_txt_code', '' );
+		if ( 'true' !== $enabled || '' === trim( $code ) ) {
+			return;
+		}
+
+		// Clean any existing output buffers before serving ads.txt
+		if ( function_exists( 'ob_get_level' ) ) {
+			$ob_level = ob_get_level();
+			if ( $ob_level < 0 ) {
+				$ob_level = 0;
+			}
+			$max_clean_level = 3;
+			$clean_attempts  = 0;
+			$max_attempts    = 5;
+
+			while ( $ob_level > 0 && $ob_level <= $max_clean_level && $clean_attempts < $max_attempts ) {
+				if ( ob_get_level() <= 0 ) {
+					break;
+				}
+				$buffer_content = ob_get_contents();
+				if ( false === $buffer_content ) {
+					break;
+				}
+				@ob_end_clean();
+				$new_level = ob_get_level();
+				if ( $new_level >= $ob_level || $new_level < 0 ) {
+					break;
+				}
+				$ob_level = $new_level;
+				$clean_attempts++;
+			}
+		}
+
+		nocache_headers();
+		status_header( 200 );
+		header( 'Content-Type: text/plain; charset=utf-8' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
+		header( 'Pragma: no-cache' );
+		header( 'Expires: 0' );
+		echo rtrim( $code, "\r\n" ) . "\n";
+		exit;
+	}
+}
+
