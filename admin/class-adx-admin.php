@@ -17,6 +17,9 @@ class Adx_Admin {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'add_settings_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
+		add_action( 'admin_init', array( $this, 'handle_setup_registration' ) );
+		add_action( 'admin_notices', array( $this, 'display_setup_notices' ) );
+		add_action( 'wp_ajax_ms_setup_remind_later', array( $this, 'ajax_remind_later' ) );
 	}
 
 
@@ -52,6 +55,10 @@ class Adx_Admin {
 			'adxbyms_flying_carpet_enabled',
 			'adxbyms_side_rail_enabled',
 			'adxbyms_exclude_links',
+			
+			// Setup onboarding
+			'ms_setup_completed',
+			'ms_setup_remind_later_time',
 			
 			// Central performance
 			'adxbyms_lazy_load',
@@ -207,6 +214,50 @@ class Adx_Admin {
 	}
 
 	/**
+	 * Handle incoming registration callback from Monetiscope.
+	 */
+	public function handle_setup_registration() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		if ( isset( $_GET['page'] ) && 'adx-ad-inserter' === $_GET['page'] && isset( $_GET['registered'] ) && '1' === $_GET['registered'] ) {
+			update_option( 'ms_setup_completed', '1' );
+			set_transient( 'ms_setup_success_notice', '1', 60 );
+			wp_safe_redirect( admin_url( 'admin.php?page=adx-ad-inserter' ) );
+			exit;
+		}
+	}
+
+	/**
+	 * Display success notice after registration.
+	 */
+	public function display_setup_notices() {
+		if ( get_transient( 'ms_setup_success_notice' ) ) {
+			?>
+			<div class="notice notice-success is-dismissible">
+				<p><strong><?php esc_html_e( 'Thanks for registering with Monetiscope.', 'adx-ad-inserter' ); ?></strong></p>
+			</div>
+			<?php
+			delete_transient( 'ms_setup_success_notice' );
+		}
+	}
+
+	/**
+	 * Handle "Remind Me Later" AJAX action.
+	 */
+	public function ajax_remind_later() {
+		check_ajax_referer( 'ms_setup_nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+		}
+
+		update_option( 'ms_setup_remind_later_time', time() );
+		wp_send_json_success();
+	}
+
+	/**
 	 * Enqueue Admin Scripts and CSS Assets.
 	 */
 	public function enqueue_admin_assets( $hook ) {
@@ -240,6 +291,8 @@ class Adx_Admin {
 			array(
 				'pluginActive'   => __( 'Plugin Active', 'adx-ad-inserter' ),
 				'pluginInactive' => __( 'Plugin Inactive', 'adx-ad-inserter' ),
+				'setupNonce'     => wp_create_nonce( 'ms_setup_nonce' ),
+				'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
 			)
 		);
 	}

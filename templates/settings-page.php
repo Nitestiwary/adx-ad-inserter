@@ -314,3 +314,13 @@ $status_registry = array(
 <script async type="module" src="https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js"></script>
 <zapier-interfaces-chatbot-embed is-popup='true' chatbot-id='cmc8tco1i00178eenqd9m351r'></zapier-interfaces-chatbot-embed>
 
+<?php
+// Include Onboarding Modal if not completed and reminder time has passed
+$ms_setup_completed = get_option( 'ms_setup_completed', '0' );
+$ms_remind_later    = (int) get_option( 'ms_setup_remind_later_time', 0 );
+
+if ( '1' !== $ms_setup_completed && time() > ( $ms_remind_later + WEEK_IN_SECONDS ) ) {
+	require_once ADXBYMS_PATH . 'templates/onboarding-modal.php';
+}
+?>
+

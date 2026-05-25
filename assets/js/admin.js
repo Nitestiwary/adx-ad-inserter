@@ -182,4 +182,40 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		});
 	}
+
+	// --- 7. Onboarding Modal Logic ---
+	const setupOverlay = document.getElementById('ms-setup-overlay');
+	if (setupOverlay) {
+		const remindBtn = document.getElementById('ms-setup-remind-later');
+		const closeBtn = document.getElementById('ms-setup-close');
+
+		function dismissSetup() {
+			setupOverlay.style.opacity = '0';
+			setTimeout(() => {
+				setupOverlay.style.display = 'none';
+			}, 300);
+
+			// AJAX call to save "Remind Me Later" time
+			if (typeof adxbyms_strings !== 'undefined' && adxbyms_strings.ajaxUrl) {
+				jQuery.post(adxbyms_strings.ajaxUrl, {
+					action: 'ms_setup_remind_later',
+					nonce: adxbyms_strings.setupNonce
+				});
+			}
+		}
+
+		if (remindBtn) {
+			remindBtn.addEventListener('click', function(e) {
+				e.preventDefault();
+				dismissSetup();
+			});
+		}
+
+		if (closeBtn) {
+			closeBtn.addEventListener('click', function(e) {
+				e.preventDefault();
+				dismissSetup();
+			});
+		}
+	}
 });
