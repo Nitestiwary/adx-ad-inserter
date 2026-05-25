@@ -727,8 +727,13 @@ class Adx_Public {
 			return; // Desktop only screens (>1200px)
 		}
 
-		$network = get_option( 'adxbyms_side_rail_network_code', '' );
-		if ( empty( $network ) ) {
+		// Support separate left/right slots; fall back to shared slot for backwards compat
+		$shared_network = get_option( 'adxbyms_side_rail_network_code', '' );
+		$left_network   = get_option( 'adxbyms_side_rail_left_network_code', $shared_network );
+		$right_network  = get_option( 'adxbyms_side_rail_right_network_code', $shared_network );
+
+		// At least one slot must be configured
+		if ( empty( $left_network ) && empty( $right_network ) ) {
 			return;
 		}
 
@@ -737,42 +742,57 @@ class Adx_Public {
 
 		// Render Left and Right Rails containers
 		?>
+		<?php if ( ! empty( $left_network ) ) : ?>
 		<div id="ms-side-rail-left" class="ms-side-rail-container">
 			<button class="ms-side-rail-close" aria-label="Close left advertisement" onclick="document.getElementById('ms-side-rail-left').style.display='none';">×</button>
 			<div id="ms-side-rail-left-slot" class="ms-side-rail-slot"></div>
 		</div>
+		<?php endif; ?>
 
+		<?php if ( ! empty( $right_network ) ) : ?>
 		<div id="ms-side-rail-right" class="ms-side-rail-container">
 			<button class="ms-side-rail-close" aria-label="Close right advertisement" onclick="document.getElementById('ms-side-rail-right').style.display='none';">×</button>
 			<div id="ms-side-rail-right-slot" class="ms-side-rail-slot"></div>
 		</div>
+		<?php endif; ?>
 
 		<script type="text/javascript">
 			window.googletag = window.googletag || { cmd: [] };
 			window.googletag.cmd.push(function() {
 				try {
-					// Register slots
-					var leftSlot = googletag.defineSlot('<?php echo esc_js( $network ); ?>', [[120, 600], [160, 600]], 'ms-side-rail-left-slot')
-						.addService(googletag.pubads());
+					var slotsToRefresh = [];
 
-					var rightSlot = googletag.defineSlot('<?php echo esc_js( $network ); ?>', [[120, 600], [160, 600]], 'ms-side-rail-right-slot')
+					<?php if ( ! empty( $left_network ) ) : ?>
+					var leftSlot = googletag.defineSlot('<?php echo esc_js( $left_network ); ?>', [[120, 600], [160, 600]], 'ms-side-rail-left-slot')
 						.addService(googletag.pubads());
-					
+					slotsToRefresh.push(leftSlot);
+					<?php endif; ?>
+
+					<?php if ( ! empty( $right_network ) ) : ?>
+					var rightSlot = googletag.defineSlot('<?php echo esc_js( $right_network ); ?>', [[120, 600], [160, 600]], 'ms-side-rail-right-slot')
+						.addService(googletag.pubads());
+					slotsToRefresh.push(rightSlot);
+					<?php endif; ?>
+
 					googletag.enableServices();
+
+					<?php if ( ! empty( $left_network ) ) : ?>
 					googletag.display('ms-side-rail-left-slot');
+					<?php endif; ?>
+					<?php if ( ! empty( $right_network ) ) : ?>
 					googletag.display('ms-side-rail-right-slot');
+					<?php endif; ?>
 
 					<?php if ( $refresh_enabled ) : ?>
-					// Viewability-based refreshing (Feature 6 requirement)
+					// Viewability-based refreshing
 					var lastRefresh = Date.now();
 					var refreshInterval = <?php echo (int) $refresh_interval; ?> * 1000;
 
 					window.addEventListener('scroll', function() {
 						if (Date.now() - lastRefresh > refreshInterval) {
-							// Simple viewability calculation
-							var leftEl = document.getElementById('ms-side-rail-left-slot');
-							if (leftEl && leftEl.getBoundingClientRect().top < window.innerHeight && leftEl.getBoundingClientRect().bottom > 0) {
-								googletag.pubads().refresh([leftSlot, rightSlot]);
+							var checkEl = document.getElementById('ms-side-rail-left-slot') || document.getElementById('ms-side-rail-right-slot');
+							if (checkEl && checkEl.getBoundingClientRect().top < window.innerHeight && checkEl.getBoundingClientRect().bottom > 0) {
+								googletag.pubads().refresh(slotsToRefresh);
 								lastRefresh = Date.now();
 								console.log("[AdX Rails] Refreshed visible side rails");
 							}

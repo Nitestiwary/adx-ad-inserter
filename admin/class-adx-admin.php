@@ -63,8 +63,13 @@ class Adx_Admin {
 
 			// Side rail specifics
 			'adxbyms_side_rail_network_code',
+			'adxbyms_side_rail_left_network_code',
+			'adxbyms_side_rail_right_network_code',
 			'adxbyms_side_rail_refresh_enabled',
 			'adxbyms_side_rail_refresh_interval',
+
+			// Offerwall trigger depth
+			'adxbyms_offerwall_onscroll_trigger',
 		);
 
 		foreach ( $central_settings as $opt ) {
