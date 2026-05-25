@@ -178,7 +178,10 @@ input:checked + .slider:before {
 
 /* Layout Hierarchy */
 .settings-container {
-	display: block;
+	display: grid;
+	grid-template-columns: 1fr 320px;
+	gap: 28px;
+	align-items: start;
 	transition: opacity 0.3s;
 }
 
@@ -602,6 +605,9 @@ textarea.ad-textarea:focus {
 
 @media (max-width: 1024px) {
 	.settings-container {
+		grid-template-columns: 1fr;
+	}
+	.settings-left {
 		grid-template-columns: 1fr;
 	}
 	.settings-nav {
