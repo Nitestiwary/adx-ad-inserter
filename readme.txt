@@ -108,6 +108,10 @@ This plugin enqueues the following external script resources:
 == Changelog ==
 
 = 1.4.0 =
+* Added: Display Page Exceptions / Target Pages checklists across all Display, Custom, Responsive, and Flying Carpet ad blocks.
+* Added: Expanded Placement Insertion target options to 19 standard categories, including Excerpt, Comment Form sections, and dynamic selector HTML element transplanting.
+* Added: Enable Custom Scripts Subsystem toggle control inside the Footer Script Injection Card.
+* Fixed: Broken sidebar headers overlapping WordPress core top horizontal nav-tabs by isolating vertical tabs completely with `.adx-nav-tab` selectors.
 * Restructured: Reorganized plugin into premium modular architecture (admin, public, includes, assets, templates).
 * Refactored: Overhauled settings page UI with a premium, modern Slate/Indigo HSL theme and custom Outfit/Inter Google Fonts family.
 * Improved: Grouped primary sidebar navigation under distinct Standard Placements, Advanced Ads, and Configuration categories with Dashicons, renaming the tab to a simple "Settings" button.

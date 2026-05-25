@@ -178,15 +178,15 @@ input:checked + .slider:before {
 
 /* Layout Hierarchy */
 .settings-container {
-	display: grid;
-	grid-template-columns: 280px 1fr;
-	gap: 28px;
-	align-items: start;
+	display: block;
 	transition: opacity 0.3s;
 }
 
 .settings-left {
-	display: contents; /* grid layout handled directly by parent settings-container */
+	display: grid;
+	grid-template-columns: 280px 1fr;
+	gap: 28px;
+	align-items: start;
 }
 
 /* Modern Left Sidebar Navigation */
@@ -224,7 +224,7 @@ input:checked + .slider:before {
 	margin-bottom: 4px;
 }
 
-.nav-tab {
+.adx-nav-tab {
 	display: flex !important;
 	align-items: center;
 	padding: 10px 16px !important;
@@ -237,12 +237,12 @@ input:checked + .slider:before {
 	transition: all 0.2s ease !important;
 }
 
-.nav-tab:hover {
+.adx-nav-tab:hover {
 	background: #f8fafc;
 	color: var(--adx-primary) !important;
 }
 
-.nav-tab-active {
+.adx-nav-tab-active {
 	background: var(--adx-primary-light) !important;
 	color: var(--adx-primary-hover) !important;
 	font-weight: 600 !important;

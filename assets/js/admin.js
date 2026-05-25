@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	console.log('[AdX] Admin JS Loaded');
 
 	// --- 1. Primary Left Sidebar Tabs Switching ---
-	const tabs = document.querySelectorAll('.nav-tab');
+	const tabs = document.querySelectorAll('.adx-nav-tab');
 	const tabContents = document.querySelectorAll('.adx-tab');
 
 	function hideAllPrimaryTabs() {
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			content.style.display = 'none';
 		});
 		tabs.forEach(tab => {
-			tab.classList.remove('nav-tab-active');
+			tab.classList.remove('adx-nav-tab-active');
 		});
 	}
 
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			hideAllPrimaryTabs();
 
 			// Activate tab link
-			tab.classList.add('nav-tab-active');
+			tab.classList.add('adx-nav-tab-active');
 
 			// Show content tab
 			const contentDiv = document.getElementById(targetId);
@@ -44,14 +44,14 @@ document.addEventListener('DOMContentLoaded', function () {
 	const activeTab = sessionStorage.getItem('adx_active_tab');
 	if (activeTab && document.getElementById(activeTab)) {
 		hideAllPrimaryTabs();
-		const tabLink = document.querySelector(`.nav-tab[data-target="${activeTab}"]`);
+		const tabLink = document.querySelector(`.adx-nav-tab[data-target="${activeTab}"]`);
 		if (tabLink) {
-			tabLink.classList.add('nav-tab-active');
+			tabLink.classList.add('adx-nav-tab-active');
 		}
 		document.getElementById(activeTab).style.display = 'block';
 	} else {
 		// Fallback default
-		const defaultTab = document.querySelector('.nav-tab');
+		const defaultTab = document.querySelector('.adx-nav-tab');
 		if (defaultTab) {
 			defaultTab.click();
 		}
@@ -127,20 +127,20 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (!offsetWrapper) return;
 
 		const value = selectElement.value;
-		const inputField = offsetWrapper.querySelector('input[type="number"]');
+		const inputField = offsetWrapper.querySelector('input');
 
-		// Show/Enable offset for specific paragraph, image, heading, or carpet selectors
-		if (['before_paragraph', 'after_paragraph', 'before_image', 'after_image', 'before_heading', 'after_paragraph_x'].includes(value)) {
-			offsetWrapper.classList.remove('disabled');
-			if (inputField) {
-				inputField.disabled = false;
-				inputField.style.cursor = 'text';
-			}
-		} else {
+		// Show/Enable offset/CSS selector input for relevant insertion targets
+		if (['disabled', 'before_content', 'after_content', 'before_post', 'after_post', 'before_comments', 'after_comments', 'footer'].includes(value)) {
 			offsetWrapper.classList.add('disabled');
 			if (inputField) {
 				inputField.disabled = true;
 				inputField.style.cursor = 'not-allowed';
+			}
+		} else {
+			offsetWrapper.classList.remove('disabled');
+			if (inputField) {
+				inputField.disabled = false;
+				inputField.style.cursor = 'text';
 			}
 		}
 	}

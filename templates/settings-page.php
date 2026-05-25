@@ -101,17 +101,17 @@ $status_registry = array(
 					<div class="settings-nav-header"><?php esc_html_e( 'Standard Placements', 'adx-ad-inserter' ); ?></div>
 					<ul>
 						<li>
-							<a href="#" class="nav-tab" data-target="tab-display-slot">
+							<a href="#" class="adx-nav-tab" data-target="tab-display-slot">
 								<span class="dashicons dashicons-grid-view" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Display Slots', 'adx-ad-inserter' ); ?>
 							</a>
 						</li>
 						<li>
-							<a href="#" class="nav-tab" data-target="tab-custom-adsense">
+							<a href="#" class="adx-nav-tab" data-target="tab-custom-adsense">
 								<span class="dashicons dashicons-code-standards" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Adsense / Custom', 'adx-ad-inserter' ); ?>
 							</a>
 						</li>
 						<li>
-							<a href="#" class="nav-tab" data-target="tab-responsive-ads">
+							<a href="#" class="adx-nav-tab" data-target="tab-responsive-ads">
 								<span class="dashicons dashicons-smartphone" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Responsive Ads', 'adx-ad-inserter' ); ?>
 							</a>
 						</li>
@@ -120,37 +120,37 @@ $status_registry = array(
 					<div class="settings-nav-header"><?php esc_html_e( 'Advanced & Overlays', 'adx-ad-inserter' ); ?></div>
 					<ul>
 						<li>
-							<a href="#" class="nav-tab" data-target="tab-anchor">
+							<a href="#" class="adx-nav-tab" data-target="tab-anchor">
 								<span class="dashicons dashicons-align-bottom" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Anchor Ad', 'adx-ad-inserter' ); ?>
 							</a>
 						</li>
 						<li>
-							<a href="#" class="nav-tab" data-target="tab-side-rail">
+							<a href="#" class="adx-nav-tab" data-target="tab-side-rail">
 								<span class="dashicons dashicons-columns" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Side Rail Ads', 'adx-ad-inserter' ); ?>
 							</a>
 						</li>
 						<li>
-							<a href="#" class="nav-tab" data-target="tab-popup-updated">
+							<a href="#" class="adx-nav-tab" data-target="tab-popup-updated">
 								<span class="dashicons dashicons-slides" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Popup Ads', 'adx-ad-inserter' ); ?>
 							</a>
 						</li>
 						<li>
-							<a href="#" class="nav-tab" data-target="tab-flying-carpet">
+							<a href="#" class="adx-nav-tab" data-target="tab-flying-carpet">
 								<span class="dashicons dashicons-format-image" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Flying Carpet Ads', 'adx-ad-inserter' ); ?>
 							</a>
 						</li>
 						<li>
-							<a href="#" class="nav-tab" data-target="tab-button-rewarded">
+							<a href="#" class="adx-nav-tab" data-target="tab-button-rewarded">
 								<span class="dashicons dashicons-awards" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Button Rewarded', 'adx-ad-inserter' ); ?>
 							</a>
 						</li>
 						<li>
-							<a href="#" class="nav-tab" data-target="tab-offerwall">
+							<a href="#" class="adx-nav-tab" data-target="tab-offerwall">
 								<span class="dashicons dashicons-lock" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Offerwall Ad', 'adx-ad-inserter' ); ?>
 							</a>
 						</li>
 						<li>
-							<a href="#" class="nav-tab" data-target="tab-interstitial">
+							<a href="#" class="adx-nav-tab" data-target="tab-interstitial">
 								<span class="dashicons dashicons-visibility" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Interstitial Ad', 'adx-ad-inserter' ); ?>
 							</a>
 						</li>
@@ -159,7 +159,7 @@ $status_registry = array(
 					<div class="settings-nav-header"><?php esc_html_e( 'Configuration', 'adx-ad-inserter' ); ?></div>
 					<ul>
 						<li>
-							<a href="#" class="nav-tab" data-target="tab-global-settings">
+							<a href="#" class="adx-nav-tab" data-target="tab-global-settings">
 								<span class="dashicons dashicons-admin-generic" style="margin-right:8px; vertical-align: middle;"></span><?php esc_html_e( 'Settings', 'adx-ad-inserter' ); ?>
 							</a>
 						</li>

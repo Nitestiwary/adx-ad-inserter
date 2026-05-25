@@ -335,6 +335,33 @@
 		};
 
 		offerwallModule.init();
+
+		// --- 4. Client-Side HTML Selector Transplant Engine ---
+		$('.adxbyms-html-placeholder').each(function () {
+			const placeholder = $(this);
+			const selector = placeholder.attr('data-selector');
+			const action = placeholder.attr('data-action');
+			if (!selector) return;
+
+			const targets = $(selector);
+			if (targets.length === 0) {
+				console.warn('[AdX Inserter] Target selector not found in DOM:', selector);
+				return;
+			}
+
+			const adContent = placeholder.contents();
+			if (adContent.length === 0) return;
+
+			if (action === 'before_html') {
+				targets.first().before(adContent);
+			} else if (action === 'inside_html') {
+				targets.first().append(adContent);
+			} else if (action === 'after_html') {
+				targets.first().after(adContent);
+			}
+
+			placeholder.remove();
+		});
 	});
 
 })(jQuery);

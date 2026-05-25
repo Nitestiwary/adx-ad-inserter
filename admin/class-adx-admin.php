@@ -89,7 +89,7 @@ class Adx_Admin {
 			register_setting( 'adxbyms_settings', "adxbyms_slot_{$i}_insertion", array( 'sanitize_callback' => 'sanitize_text_field' ) );
 			register_setting( 'adxbyms_settings', "adxbyms_slot_{$i}_alignment", array( 'sanitize_callback' => 'sanitize_text_field' ) );
 			register_setting( 'adxbyms_settings', "adxbyms_slot_{$i}_text", array( 'sanitize_callback' => 'sanitize_text_field' ) );
-			register_setting( 'adxbyms_settings', "adxbyms_slot_{$i}_offset", array( 'sanitize_callback' => 'absint' ) );
+			register_setting( 'adxbyms_settings', "adxbyms_slot_{$i}_offset", array( 'sanitize_callback' => 'sanitize_text_field' ) );
 			register_setting( 'adxbyms_settings', "adxbyms_slot_{$i}_devices", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
 		}
 
@@ -98,8 +98,9 @@ class Adx_Admin {
 			register_setting( 'adxbyms_settings', "adxbyms_custom_adsense_block_{$i}_enabled", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
 			register_setting( 'adxbyms_settings', "adxbyms_custom_adsense_block_{$i}_code", array( 'sanitize_callback' => array( $this, 'sanitize_raw_code' ) ) );
 			register_setting( 'adxbyms_settings', "adxbyms_custom_adsense_block_{$i}_insertion", array( 'sanitize_callback' => 'sanitize_text_field' ) );
-			register_setting( 'adxbyms_settings', "adxbyms_custom_adsense_block_{$i}_offset", array( 'sanitize_callback' => 'absint' ) );
+			register_setting( 'adxbyms_settings', "adxbyms_custom_adsense_block_{$i}_offset", array( 'sanitize_callback' => 'sanitize_text_field' ) );
 			register_setting( 'adxbyms_settings', "adxbyms_custom_adsense_block_{$i}_alignment", array( 'sanitize_callback' => 'sanitize_text_field' ) );
+			register_setting( 'adxbyms_settings', "adxbyms_custom_adsense_block_{$i}_pages", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
 			register_setting( 'adxbyms_settings', "adxbyms_custom_adsense_block_{$i}_devices", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
 		}
 
@@ -108,8 +109,9 @@ class Adx_Admin {
 			register_setting( 'adxbyms_settings', "adxbyms_responsive_block_{$i}_enabled", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
 			register_setting( 'adxbyms_settings', "adxbyms_responsive_block_{$i}_network_code", array( 'sanitize_callback' => 'sanitize_text_field' ) );
 			register_setting( 'adxbyms_settings', "adxbyms_responsive_block_{$i}_insertion", array( 'sanitize_callback' => 'sanitize_text_field' ) );
-			register_setting( 'adxbyms_settings', "adxbyms_responsive_block_{$i}_offset", array( 'sanitize_callback' => 'absint' ) );
+			register_setting( 'adxbyms_settings', "adxbyms_responsive_block_{$i}_offset", array( 'sanitize_callback' => 'sanitize_text_field' ) );
 			register_setting( 'adxbyms_settings', "adxbyms_responsive_block_{$i}_alignment", array( 'sanitize_callback' => 'sanitize_text_field' ) );
+			register_setting( 'adxbyms_settings', "adxbyms_responsive_block_{$i}_pages", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
 			register_setting( 'adxbyms_settings', "adxbyms_responsive_block_{$i}_devices", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
 		}
 
@@ -118,8 +120,9 @@ class Adx_Admin {
 			register_setting( 'adxbyms_settings', "adxbyms_flying_carpet_block_{$i}_enabled", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
 			register_setting( 'adxbyms_settings', "adxbyms_flying_carpet_block_{$i}_network_code", array( 'sanitize_callback' => 'sanitize_text_field' ) );
 			register_setting( 'adxbyms_settings', "adxbyms_flying_carpet_block_{$i}_insertion", array( 'sanitize_callback' => 'sanitize_text_field' ) );
-			register_setting( 'adxbyms_settings', "adxbyms_flying_carpet_block_{$i}_offset", array( 'sanitize_callback' => 'absint' ) );
+			register_setting( 'adxbyms_settings', "adxbyms_flying_carpet_block_{$i}_offset", array( 'sanitize_callback' => 'sanitize_text_field' ) );
 			register_setting( 'adxbyms_settings', "adxbyms_flying_carpet_block_{$i}_alignment", array( 'sanitize_callback' => 'sanitize_text_field' ) );
+			register_setting( 'adxbyms_settings', "adxbyms_flying_carpet_block_{$i}_pages", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
 			register_setting( 'adxbyms_settings', "adxbyms_flying_carpet_block_{$i}_devices", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
 		}
 	}

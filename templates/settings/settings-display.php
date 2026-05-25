@@ -108,20 +108,31 @@ defined( 'ABSPATH' ) || exit;
 					<div>
 						<label for="adxbyms_slot_<?php echo esc_attr( $i ); ?>_insertion"><?php esc_html_e( 'Insertion Target', 'adx-ad-inserter' ); ?></label>
 						<select name="adxbyms_slot_<?php echo esc_attr( $i ); ?>_insertion" id="adxbyms_slot_<?php echo esc_attr( $i ); ?>_insertion">
-							<option value="before_post" <?php selected( $insertion, 'before_post' ); ?>><?php esc_html_e( 'Before Post (Hook)', 'adx-ad-inserter' ); ?></option>
-							<option value="after_post" <?php selected( $insertion, 'after_post' ); ?>><?php esc_html_e( 'After Post (Hook)', 'adx-ad-inserter' ); ?></option>
-							<option value="before_content" <?php selected( $insertion, 'before_content' ); ?>><?php esc_html_e( 'Before Content', 'adx-ad-inserter' ); ?></option>
-							<option value="after_content" <?php selected( $insertion, 'after_content' ); ?>><?php esc_html_e( 'After Content', 'adx-ad-inserter' ); ?></option>
-							<option value="before_paragraph" <?php selected( $insertion, 'before_paragraph' ); ?>><?php esc_html_e( 'Before Paragraph X', 'adx-ad-inserter' ); ?></option>
-							<option value="after_paragraph" <?php selected( $insertion, 'after_paragraph' ); ?>><?php esc_html_e( 'After Paragraph X', 'adx-ad-inserter' ); ?></option>
-							<option value="before_image" <?php selected( $insertion, 'before_image' ); ?>><?php esc_html_e( 'Before Image X', 'adx-ad-inserter' ); ?></option>
-							<option value="after_image" <?php selected( $insertion, 'after_image' ); ?>><?php esc_html_e( 'After Image X', 'adx-ad-inserter' ); ?></option>
+							<option value="disabled" <?php selected( $insertion, 'disabled' ); ?>><?php esc_html_e( 'Disabled', 'adx-ad-inserter' ); ?></option>
+							<option value="before_post" <?php selected( $insertion, 'before_post' ); ?>><?php esc_html_e( 'Before post', 'adx-ad-inserter' ); ?></option>
+							<option value="before_content" <?php selected( $insertion, 'before_content' ); ?>><?php esc_html_e( 'Before content', 'adx-ad-inserter' ); ?></option>
+							<option value="before_paragraph" <?php selected( $insertion, 'before_paragraph' ); ?>><?php esc_html_e( 'Before paragraph', 'adx-ad-inserter' ); ?></option>
+							<option value="after_paragraph" <?php selected( $insertion, 'after_paragraph' ); ?>><?php esc_html_e( 'After paragraph', 'adx-ad-inserter' ); ?></option>
+							<option value="before_image" <?php selected( $insertion, 'before_image' ); ?>><?php esc_html_e( 'Before image', 'adx-ad-inserter' ); ?></option>
+							<option value="after_image" <?php selected( $insertion, 'after_image' ); ?>><?php esc_html_e( 'After image', 'adx-ad-inserter' ); ?></option>
+							<option value="after_content" <?php selected( $insertion, 'after_content' ); ?>><?php esc_html_e( 'After content', 'adx-ad-inserter' ); ?></option>
+							<option value="after_post" <?php selected( $insertion, 'after_post' ); ?>><?php esc_html_e( 'After post', 'adx-ad-inserter' ); ?></option>
+							<option value="before_excerpt" <?php selected( $insertion, 'before_excerpt' ); ?>><?php esc_html_e( 'Before excerpt', 'adx-ad-inserter' ); ?></option>
+							<option value="after_excerpt" <?php selected( $insertion, 'after_excerpt' ); ?>><?php esc_html_e( 'After excerpt', 'adx-ad-inserter' ); ?></option>
+							<option value="between_posts" <?php selected( $insertion, 'between_posts' ); ?>><?php esc_html_e( 'Between posts', 'adx-ad-inserter' ); ?></option>
+							<option value="before_comments" <?php selected( $insertion, 'before_comments' ); ?>><?php esc_html_e( 'Before comments', 'adx-ad-inserter' ); ?></option>
+							<option value="between_comments" <?php selected( $insertion, 'between_comments' ); ?>><?php esc_html_e( 'Between comments', 'adx-ad-inserter' ); ?></option>
+							<option value="after_comments" <?php selected( $insertion, 'after_comments' ); ?>><?php esc_html_e( 'After comments', 'adx-ad-inserter' ); ?></option>
+							<option value="footer" <?php selected( $insertion, 'footer' ); ?>><?php esc_html_e( 'Footer', 'adx-ad-inserter' ); ?></option>
+							<option value="before_html" <?php selected( $insertion, 'before_html' ); ?>><?php esc_html_e( 'Before HTML element', 'adx-ad-inserter' ); ?></option>
+							<option value="inside_html" <?php selected( $insertion, 'inside_html' ); ?>><?php esc_html_e( 'Inside HTML element', 'adx-ad-inserter' ); ?></option>
+							<option value="after_html" <?php selected( $insertion, 'after_html' ); ?>><?php esc_html_e( 'After HTML element', 'adx-ad-inserter' ); ?></option>
 						</select>
 					</div>
 
 					<div class="offset-wrapper">
 						<label for="adxbyms_slot_<?php echo esc_attr( $i ); ?>_offset"><?php esc_html_e( 'Index (X)', 'adx-ad-inserter' ); ?></label>
-						<input type="number" name="adxbyms_slot_<?php echo esc_attr( $i ); ?>_offset" id="adxbyms_slot_<?php echo esc_attr( $i ); ?>_offset" value="<?php echo esc_attr( $offset ); ?>" min="1" max="50">
+						<input type="text" name="adxbyms_slot_<?php echo esc_attr( $i ); ?>_offset" id="adxbyms_slot_<?php echo esc_attr( $i ); ?>_offset" value="<?php echo esc_attr( $offset ); ?>">
 						<span class="help-text" style="font-size: 0.72rem; margin-top:2px; line-height:1.2;"><?php esc_html_e( 'Position offset (e.g. Xth paragraph)', 'adx-ad-inserter' ); ?></span>
 					</div>
 

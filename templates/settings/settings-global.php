@@ -112,6 +112,15 @@ $ads_label        = $ads_txt_en ? __( 'Active', 'adx-ad-inserter' ) : __( 'Disab
 				</div>
 			</div>
 			<div class="card-body">
+				<div style="display:flex; justify-content:space-between; align-items:center; background: #eff6ff; padding:12px 20px; border-radius:8px; margin-bottom:20px; border-left:4px solid var(--adx-primary);">
+					<span style="font-weight: 600; font-size: 0.95rem; color: var(--adx-text);"><?php esc_html_e( 'Enable Custom Scripts Subsystem', 'adx-ad-inserter' ); ?></span>
+					<label class="switch">
+						<input type="hidden" name="adxbyms_custom_enabled" value="false" />
+						<input type="checkbox" name="adxbyms_custom_enabled" value="true" <?php checked( $custom_enabled, true ); ?> />
+						<span class="slider round"></span>
+					</label>
+				</div>
+
 				<p class="description" style="margin-top: 0; margin-bottom: 20px; color: var(--adx-text-muted);">
 					<?php esc_html_e( 'Inject tracker pixels, conversion counters, or body script tags globally right before the closing </body> tag.', 'adx-ad-inserter' ); ?>
 				</p>

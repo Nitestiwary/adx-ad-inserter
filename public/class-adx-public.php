@@ -33,6 +33,12 @@ class Adx_Public {
 		add_action( 'wp_head', array( $this, 'inject_header_ads' ) );
 		add_action( 'wp_footer', array( $this, 'inject_footer_ads' ) );
 
+		// Excerpt and comments filters
+		add_filter( 'the_excerpt', array( $this, 'inject_excerpt_ads' ), 99 );
+		add_action( 'comment_form_before', array( $this, 'inject_before_comments_ads' ) );
+		add_action( 'comment_form_after', array( $this, 'inject_after_comments_ads' ) );
+		add_filter( 'comment_text', array( $this, 'inject_between_comments_ads' ), 99, 2 );
+
 		// Ads.txt Rewrite and Query Variables
 		add_filter( 'query_vars', array( $this, 'register_ads_txt_query_var' ) );
 		add_action( 'template_redirect', array( $this, 'serve_ads_txt' ), 0 );
@@ -179,7 +185,7 @@ class Adx_Public {
 				$network   = get_option( "adxbyms_slot_{$i}_network_code", '' );
 				$sizes     = (array) get_option( "adxbyms_slot_{$i}_sizes", array() );
 				$insertion = get_option( "adxbyms_slot_{$i}_insertion", '' );
-				$offset    = absint( get_option( "adxbyms_slot_{$i}_offset", 1 ) );
+				$offset    = get_option( "adxbyms_slot_{$i}_offset", '1' );
 				$alignment = get_option( "adxbyms_slot_{$i}_alignment", 'center' );
 				$pages     = (array) get_option( "adxbyms_slot_{$i}_pages", array() );
 				$devices   = (array) get_option( "adxbyms_slot_{$i}_devices", array() );
@@ -189,7 +195,7 @@ class Adx_Public {
 				}
 
 				// Skip before/after hooks inside content filter
-				if ( 'before_post' === $insertion || 'after_post' === $insertion || 'manual' === $insertion ) {
+				if ( in_array( $insertion, array( 'before_post', 'after_post', 'manual', 'before_excerpt', 'after_excerpt', 'before_comments', 'between_comments', 'after_comments', 'footer' ), true ) ) {
 					continue;
 				}
 
@@ -197,9 +203,17 @@ class Adx_Public {
 					continue;
 				}
 
+				if ( in_array( $insertion, array( 'before_html', 'inside_html', 'after_html' ), true ) ) {
+					$div_id  = 'div-gpt-ad-slot-html-' . $i . '-' . uniqid();
+					$ad_html = Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment );
+					$placeholder = '<div class="adxbyms-html-placeholder" data-selector="' . esc_attr( $offset ) . '" data-action="' . esc_attr( $insertion ) . '" style="display:none;">' . $ad_html . '</div>';
+					$content .= $placeholder;
+					continue;
+				}
+
 				$div_id  = 'div-gpt-ad-slot-' . $i . '-' . uniqid();
 				$ad_html = Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment );
-				$content = Adx_Content_Inserter::insert( $content, $ad_html, $insertion, $offset );
+				$content = Adx_Content_Inserter::insert( $content, $ad_html, $insertion, absint( $offset ) );
 			}
 		}
 
@@ -209,21 +223,28 @@ class Adx_Public {
 				$enabled   = ( 'true' === get_option( "adxbyms_custom_adsense_block_{$i}_enabled" ) );
 				$code      = get_option( "adxbyms_custom_adsense_block_{$i}_code", '' );
 				$insertion = get_option( "adxbyms_custom_adsense_block_{$i}_insertion", '' );
-				$offset    = absint( get_option( "adxbyms_custom_adsense_block_{$i}_offset", 1 ) );
+				$offset    = get_option( "adxbyms_custom_adsense_block_{$i}_offset", '1' );
 				$alignment = get_option( "adxbyms_custom_adsense_block_{$i}_alignment", 'center' );
 				$devices   = (array) get_option( "adxbyms_custom_adsense_block_{$i}_devices", array() );
+				$pages     = (array) get_option( "adxbyms_custom_adsense_block_{$i}_pages", array() );
 
-				if ( ! $enabled || empty( $code ) || 'manual' === $insertion || 'sticky_bottom' === $insertion ) {
+				if ( ! $enabled || empty( $code ) || in_array( $insertion, array( 'manual', 'sticky_bottom', 'before_excerpt', 'after_excerpt', 'before_comments', 'between_comments', 'after_comments', 'footer' ), true ) ) {
 					continue;
 				}
 
-				if ( ! Adx_Device::matches( $devices ) ) {
+				if ( ! $this->check_page_types( $pages ) || ! Adx_Device::matches( $devices ) ) {
 					continue;
 				}
 
-				// Render code
+				if ( in_array( $insertion, array( 'before_html', 'inside_html', 'after_html' ), true ) ) {
+					$ad_html = $this->build_custom_html_container( wp_unslash( $code ), $alignment );
+					$placeholder = '<div class="adxbyms-html-placeholder" data-selector="' . esc_attr( $offset ) . '" data-action="' . esc_attr( $insertion ) . '" style="display:none;">' . $ad_html . '</div>';
+					$content .= $placeholder;
+					continue;
+				}
+
 				$ad_html = $this->build_custom_html_container( wp_unslash( $code ), $alignment );
-				$content = Adx_Content_Inserter::insert( $content, $ad_html, $insertion, $offset );
+				$content = Adx_Content_Inserter::insert( $content, $ad_html, $insertion, absint( $offset ) );
 			}
 		}
 
@@ -233,20 +254,28 @@ class Adx_Public {
 				$enabled   = ( 'true' === get_option( "adxbyms_responsive_block_{$i}_enabled" ) );
 				$network   = get_option( "adxbyms_responsive_block_{$i}_network_code", '' );
 				$insertion = get_option( "adxbyms_responsive_block_{$i}_insertion", '' );
-				$offset    = absint( get_option( "adxbyms_responsive_block_{$i}_offset", 1 ) );
+				$offset    = get_option( "adxbyms_responsive_block_{$i}_offset", '1' );
 				$alignment = get_option( "adxbyms_responsive_block_{$i}_alignment", 'center' );
 				$devices   = (array) get_option( "adxbyms_responsive_block_{$i}_devices", array() );
+				$pages     = (array) get_option( "adxbyms_responsive_block_{$i}_pages", array() );
 
-				if ( ! $enabled || empty( $network ) || 'manual' === $insertion ) {
+				if ( ! $enabled || empty( $network ) || in_array( $insertion, array( 'manual', 'before_excerpt', 'after_excerpt', 'before_comments', 'between_comments', 'after_comments', 'footer' ), true ) ) {
 					continue;
 				}
 
-				if ( ! Adx_Device::matches( $devices ) ) {
+				if ( ! $this->check_page_types( $pages ) || ! Adx_Device::matches( $devices ) ) {
+					continue;
+				}
+
+				if ( in_array( $insertion, array( 'before_html', 'inside_html', 'after_html' ), true ) ) {
+					$ad_html = $this->build_responsive_gpt_ad( $network, $i, $alignment );
+					$placeholder = '<div class="adxbyms-html-placeholder" data-selector="' . esc_attr( $offset ) . '" data-action="' . esc_attr( $insertion ) . '" style="display:none;">' . $ad_html . '</div>';
+					$content .= $placeholder;
 					continue;
 				}
 
 				$ad_html = $this->build_responsive_gpt_ad( $network, $i, $alignment );
-				$content = Adx_Content_Inserter::insert( $content, $ad_html, $insertion, $offset );
+				$content = Adx_Content_Inserter::insert( $content, $ad_html, $insertion, absint( $offset ) );
 			}
 		}
 
@@ -256,15 +285,16 @@ class Adx_Public {
 				$enabled   = ( 'true' === get_option( "adxbyms_flying_carpet_block_{$i}_enabled" ) );
 				$network   = get_option( "adxbyms_flying_carpet_block_{$i}_network_code", '' );
 				$insertion = get_option( "adxbyms_flying_carpet_block_{$i}_insertion", '' );
-				$offset    = absint( get_option( "adxbyms_flying_carpet_block_{$i}_offset", 1 ) );
+				$offset    = absint( get_option( "adxbyms_flying_carpet_block_{$i}_offset", 2 ) );
 				$alignment = get_option( "adxbyms_flying_carpet_block_{$i}_alignment", 'center' );
 				$devices   = (array) get_option( "adxbyms_flying_carpet_block_{$i}_devices", array() );
+				$pages     = (array) get_option( "adxbyms_flying_carpet_block_{$i}_pages", array() );
 
 				if ( ! $enabled || empty( $network ) || 'manual' === $insertion ) {
 					continue;
 				}
 
-				if ( ! Adx_Device::matches( $devices ) ) {
+				if ( ! $this->check_page_types( $pages ) || ! Adx_Device::matches( $devices ) ) {
 					continue;
 				}
 
@@ -339,6 +369,268 @@ class Adx_Public {
 
 			$div_id  = 'div-gpt-ad-slot-after-' . $i;
 			echo Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+	}
+
+	public static $comment_counter = 0;
+
+	/**
+	 * Auto Inject Ads In Excerpt.
+	 */
+	public function inject_excerpt_ads( $excerpt ) {
+		if ( ! $this->can_render_ads() || empty( $excerpt ) || ! is_string( $excerpt ) ) {
+			return $excerpt;
+		}
+
+		// Check Display Slots
+		if ( 'true' === get_option( 'adxbyms_slot_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 10; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_slot_{$i}_enabled" ) );
+				$network   = get_option( "adxbyms_slot_{$i}_network_code", '' );
+				$sizes     = (array) get_option( "adxbyms_slot_{$i}_sizes", array() );
+				$insertion = get_option( "adxbyms_slot_{$i}_insertion", '' );
+				$alignment = get_option( "adxbyms_slot_{$i}_alignment", 'center' );
+				$pages     = (array) get_option( "adxbyms_slot_{$i}_pages", array() );
+				$devices   = (array) get_option( "adxbyms_slot_{$i}_devices", array() );
+
+				if ( ! $enabled || empty( $network ) || empty( $sizes ) ) {
+					continue;
+				}
+				if ( 'before_excerpt' !== $insertion && 'after_excerpt' !== $insertion ) {
+					continue;
+				}
+				if ( ! $this->check_page_types( $pages ) || ! Adx_Device::matches( $devices ) ) {
+					continue;
+				}
+
+				$div_id  = 'div-gpt-ad-slot-ex-' . $i . '-' . uniqid();
+				$ad_html = Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment );
+
+				if ( 'before_excerpt' === $insertion ) {
+					$excerpt = $ad_html . $excerpt;
+				} else {
+					$excerpt = $excerpt . $ad_html;
+				}
+			}
+		}
+
+		// Check Custom Adsense
+		if ( 'true' === get_option( 'adxbyms_custom_adsense_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 10; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_custom_adsense_block_{$i}_enabled" ) );
+				$code      = get_option( "adxbyms_custom_adsense_block_{$i}_code", '' );
+				$insertion = get_option( "adxbyms_custom_adsense_block_{$i}_insertion", '' );
+				$alignment = get_option( "adxbyms_custom_adsense_block_{$i}_alignment", 'center' );
+				$pages     = (array) get_option( "adxbyms_custom_adsense_block_{$i}_pages", array() );
+				$devices   = (array) get_option( "adxbyms_custom_adsense_block_{$i}_devices", array() );
+
+				if ( ! $enabled || empty( $code ) ) {
+					continue;
+				}
+				if ( 'before_excerpt' !== $insertion && 'after_excerpt' !== $insertion ) {
+					continue;
+				}
+				if ( ! $this->check_page_types( $pages ) || ! Adx_Device::matches( $devices ) ) {
+					continue;
+				}
+
+				$ad_html = $this->build_custom_html_container( wp_unslash( $code ), $alignment );
+
+				if ( 'before_excerpt' === $insertion ) {
+					$excerpt = $ad_html . $excerpt;
+				} else {
+					$excerpt = $excerpt . $ad_html;
+				}
+			}
+		}
+
+		// Check Responsive Ads
+		if ( 'true' === get_option( 'adxbyms_responsive_ads_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 5; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_responsive_block_{$i}_enabled" ) );
+				$network   = get_option( "adxbyms_responsive_block_{$i}_network_code", '' );
+				$insertion = get_option( "adxbyms_responsive_block_{$i}_insertion", '' );
+				$alignment = get_option( "adxbyms_responsive_block_{$i}_alignment", 'center' );
+				$pages     = (array) get_option( "adxbyms_responsive_block_{$i}_pages", array() );
+				$devices   = (array) get_option( "adxbyms_responsive_block_{$i}_devices", array() );
+
+				if ( ! $enabled || empty( $network ) ) {
+					continue;
+				}
+				if ( 'before_excerpt' !== $insertion && 'after_excerpt' !== $insertion ) {
+					continue;
+				}
+				if ( ! $this->check_page_types( $pages ) || ! Adx_Device::matches( $devices ) ) {
+					continue;
+				}
+
+				$ad_html = $this->build_responsive_gpt_ad( $network, $i, $alignment );
+
+				if ( 'before_excerpt' === $insertion ) {
+					$excerpt = $ad_html . $excerpt;
+				} else {
+					$excerpt = $excerpt . $ad_html;
+				}
+			}
+		}
+
+		return $excerpt;
+	}
+
+	/**
+	 * Before comments section hook handler.
+	 */
+	public function inject_before_comments_ads() {
+		if ( ! $this->can_render_ads() ) {
+			return;
+		}
+		$this->render_comments_ads_by_insertion( 'before_comments' );
+	}
+
+	/**
+	 * After comments section hook handler.
+	 */
+	public function inject_after_comments_ads() {
+		if ( ! $this->can_render_ads() ) {
+			return;
+		}
+		$this->render_comments_ads_by_insertion( 'after_comments' );
+	}
+
+	/**
+	 * Between comments loop parser.
+	 */
+	public function inject_between_comments_ads( $comment_text, $comment = null ) {
+		if ( ! $this->can_render_ads() || empty( $comment_text ) ) {
+			return $comment_text;
+		}
+
+		self::$comment_counter++;
+		$offset = self::$comment_counter;
+
+		// 1. Display Slots
+		if ( 'true' === get_option( 'adxbyms_slot_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 10; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_slot_{$i}_enabled" ) );
+				$network   = get_option( "adxbyms_slot_{$i}_network_code", '' );
+				$sizes     = (array) get_option( "adxbyms_slot_{$i}_sizes", array() );
+				$insertion = get_option( "adxbyms_slot_{$i}_insertion", '' );
+				$alignment = get_option( "adxbyms_slot_{$i}_alignment", 'center' );
+				$pages     = (array) get_option( "adxbyms_slot_{$i}_pages", array() );
+				$devices   = (array) get_option( "adxbyms_slot_{$i}_devices", array() );
+				$ad_offset = get_option( "adxbyms_slot_{$i}_offset", '1' );
+
+				if ( $enabled && ! empty( $network ) && ! empty( $sizes ) && 'between_comments' === $insertion && (int) $offset === absint( $ad_offset ) ) {
+					if ( $this->check_page_types( $pages ) && Adx_Device::matches( $devices ) ) {
+						$div_id  = 'div-gpt-ad-slot-bc-' . $i . '-' . uniqid();
+						$ad_html = Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment );
+						$comment_text .= $ad_html;
+					}
+				}
+			}
+		}
+
+		// 2. Custom Adsense
+		if ( 'true' === get_option( 'adxbyms_custom_adsense_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 10; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_custom_adsense_block_{$i}_enabled" ) );
+				$code      = get_option( "adxbyms_custom_adsense_block_{$i}_code", '' );
+				$insertion = get_option( "adxbyms_custom_adsense_block_{$i}_insertion", '' );
+				$alignment = get_option( "adxbyms_custom_adsense_block_{$i}_alignment", 'center' );
+				$pages     = (array) get_option( "adxbyms_custom_adsense_block_{$i}_pages", array() );
+				$devices   = (array) get_option( "adxbyms_custom_adsense_block_{$i}_devices", array() );
+				$ad_offset = get_option( "adxbyms_custom_adsense_block_{$i}_offset", '1' );
+
+				if ( $enabled && ! empty( $code ) && 'between_comments' === $insertion && (int) $offset === absint( $ad_offset ) ) {
+					if ( $this->check_page_types( $pages ) && Adx_Device::matches( $devices ) ) {
+						$ad_html = $this->build_custom_html_container( wp_unslash( $code ), $alignment );
+						$comment_text .= $ad_html;
+					}
+				}
+			}
+		}
+
+		// 3. Responsive Ads
+		if ( 'true' === get_option( 'adxbyms_responsive_ads_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 5; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_responsive_block_{$i}_enabled" ) );
+				$network   = get_option( "adxbyms_responsive_block_{$i}_network_code", '' );
+				$insertion = get_option( "adxbyms_responsive_block_{$i}_insertion", '' );
+				$alignment = get_option( "adxbyms_responsive_block_{$i}_alignment", 'center' );
+				$pages     = (array) get_option( "adxbyms_responsive_block_{$i}_pages", array() );
+				$devices   = (array) get_option( "adxbyms_responsive_block_{$i}_devices", array() );
+				$ad_offset = get_option( "adxbyms_responsive_block_{$i}_offset", '1' );
+
+				if ( $enabled && ! empty( $network ) && 'between_comments' === $insertion && (int) $offset === absint( $ad_offset ) ) {
+					if ( $this->check_page_types( $pages ) && Adx_Device::matches( $devices ) ) {
+						$ad_html = $this->build_responsive_gpt_ad( $network, $i, $alignment );
+						$comment_text .= $ad_html;
+					}
+				}
+			}
+		}
+
+		return $comment_text;
+	}
+
+	/**
+	 * Helper helper render comments ads.
+	 */
+	private function render_comments_ads_by_insertion( $insertion_type ) {
+		// 1. Display Slots
+		if ( 'true' === get_option( 'adxbyms_slot_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 10; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_slot_{$i}_enabled" ) );
+				$network   = get_option( "adxbyms_slot_{$i}_network_code", '' );
+				$sizes     = (array) get_option( "adxbyms_slot_{$i}_sizes", array() );
+				$insertion = get_option( "adxbyms_slot_{$i}_insertion", '' );
+				$alignment = get_option( "adxbyms_slot_{$i}_alignment", 'center' );
+				$pages     = (array) get_option( "adxbyms_slot_{$i}_pages", array() );
+				$devices   = (array) get_option( "adxbyms_slot_{$i}_devices", array() );
+
+				if ( $enabled && ! empty( $network ) && ! empty( $sizes ) && $insertion_type === $insertion ) {
+					if ( $this->check_page_types( $pages ) && Adx_Device::matches( $devices ) ) {
+						$div_id  = 'div-gpt-ad-slot-cm-' . $i . '-' . uniqid();
+						echo Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
+				}
+			}
+		}
+
+		// 2. Custom Adsense
+		if ( 'true' === get_option( 'adxbyms_custom_adsense_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 10; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_custom_adsense_block_{$i}_enabled" ) );
+				$code      = get_option( "adxbyms_custom_adsense_block_{$i}_code", '' );
+				$insertion = get_option( "adxbyms_custom_adsense_block_{$i}_insertion", '' );
+				$alignment = get_option( "adxbyms_custom_adsense_block_{$i}_alignment", 'center' );
+				$pages     = (array) get_option( "adxbyms_custom_adsense_block_{$i}_pages", array() );
+				$devices   = (array) get_option( "adxbyms_custom_adsense_block_{$i}_devices", array() );
+
+				if ( $enabled && ! empty( $code ) && $insertion_type === $insertion ) {
+					if ( $this->check_page_types( $pages ) && Adx_Device::matches( $devices ) ) {
+						echo $this->build_custom_html_container( wp_unslash( $code ), $alignment ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
+				}
+			}
+		}
+
+		// 3. Responsive Ads
+		if ( 'true' === get_option( 'adxbyms_responsive_ads_enabled', 'false' ) ) {
+			for ( $i = 1; $i <= 5; $i++ ) {
+				$enabled   = ( 'true' === get_option( "adxbyms_responsive_block_{$i}_enabled" ) );
+				$network   = get_option( "adxbyms_responsive_block_{$i}_network_code", '' );
+				$insertion = get_option( "adxbyms_responsive_block_{$i}_insertion", '' );
+				$alignment = get_option( "adxbyms_responsive_block_{$i}_alignment", 'center' );
+				$pages     = (array) get_option( "adxbyms_responsive_block_{$i}_pages", array() );
+				$devices   = (array) get_option( "adxbyms_responsive_block_{$i}_devices", array() );
+
+				if ( $enabled && ! empty( $network ) && $insertion_type === $insertion ) {
+					if ( $this->check_page_types( $pages ) && Adx_Device::matches( $devices ) ) {
+						echo $this->build_responsive_gpt_ad( $network, $i, $alignment ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
+				}
+			}
 		}
 	}
 
@@ -649,12 +941,13 @@ class Adx_Public {
 		$code      = get_option( "adxbyms_custom_adsense_block_{$id}_code", '' );
 		$align     = get_option( "adxbyms_custom_adsense_block_{$id}_alignment", 'center' );
 		$devices   = (array) get_option( "adxbyms_custom_adsense_block_{$id}_devices", array() );
+		$pages     = (array) get_option( "adxbyms_custom_adsense_block_{$id}_pages", array() );
 
 		if ( ! $enabled || empty( $code ) ) {
 			return '';
 		}
 
-		if ( ! Adx_Device::matches( $devices ) ) {
+		if ( ! $this->check_page_types( $pages ) || ! Adx_Device::matches( $devices ) ) {
 			return '';
 		}
 
@@ -677,12 +970,13 @@ class Adx_Public {
 		$network   = get_option( "adxbyms_responsive_block_{$id}_network_code", '' );
 		$align     = get_option( "adxbyms_responsive_block_{$id}_alignment", 'center' );
 		$devices   = (array) get_option( "adxbyms_responsive_block_{$id}_devices", array() );
+		$pages     = (array) get_option( "adxbyms_responsive_block_{$id}_pages", array() );
 
 		if ( ! $enabled || empty( $network ) ) {
 			return '';
 		}
 
-		if ( ! Adx_Device::matches( $devices ) ) {
+		if ( ! $this->check_page_types( $pages ) || ! Adx_Device::matches( $devices ) ) {
 			return '';
 		}
 
@@ -705,12 +999,13 @@ class Adx_Public {
 		$network   = get_option( "adxbyms_flying_carpet_block_{$id}_network_code", '' );
 		$align     = get_option( "adxbyms_flying_carpet_block_{$id}_alignment", 'center' );
 		$devices   = (array) get_option( "adxbyms_flying_carpet_block_{$id}_devices", array() );
+		$pages     = (array) get_option( "adxbyms_flying_carpet_block_{$id}_pages", array() );
 
 		if ( ! $enabled || empty( $network ) ) {
 			return '';
 		}
 
-		if ( ! Adx_Device::matches( $devices ) ) {
+		if ( ! $this->check_page_types( $pages ) || ! Adx_Device::matches( $devices ) ) {
 			return '';
 		}
 
