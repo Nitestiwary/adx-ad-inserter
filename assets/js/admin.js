@@ -86,8 +86,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	setupSubtabs('.display-tab', '.display-content');
-	setupSubtabs('.responsive-tab', '.responsive-content');
-	setupSubtabs('.flying-carpet-tab', '.flying-carpet-content');
 	setupSubtabs('.global-tab', '.global-content');
 
 

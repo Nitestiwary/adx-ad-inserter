@@ -33,7 +33,7 @@ defined( 'ABSPATH' ) || exit;
 				$badge_class = $sub_enabled ? 'tab-green' : 'tab-red';
 			}
 			?>
-			<div class="flying-carpet-tab display-tab <?php echo esc_attr( $badge_class ); ?>" style="padding: 10px 18px;">
+			<div class="flying-carpet-tab display-tab <?php echo esc_attr( $badge_class ); ?>">
 				<?php printf( esc_html__( 'Block %d', 'adx-ad-inserter' ), (int) $i ); ?>
 			</div>
 		<?php endfor; ?>
