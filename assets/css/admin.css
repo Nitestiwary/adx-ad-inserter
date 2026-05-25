@@ -138,7 +138,7 @@ input:checked + .slider:before {
 
 /* Head Help Banner */
 .head-banner {
-	max-width: 550px;
+	max-width: 650px;
 }
 
 .head-banner img {

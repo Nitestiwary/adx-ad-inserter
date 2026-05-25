@@ -70,7 +70,8 @@ $status_registry = array(
 		<div class="form-header">
 			<h1 class="settings-title"><?php esc_html_e( 'AdX Ad Inserter', 'adx-ad-inserter' ); ?></h1>
 			<div class="form-actions">
-				<!-- Plugin Active toggle removed -->
+				<!-- Empty spacer to push banner to center -->
+				<div class="flex-spacer" style="width: 140px;"></div>
 
 				<div class="head-banner">
 					<a href="https://monetiscope.com/contact/" target="_blank" rel="noopener noreferrer">

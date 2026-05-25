@@ -42,6 +42,9 @@ class Adx_Public {
 		// Ads.txt Rewrite and Query Variables
 		add_filter( 'query_vars', array( $this, 'register_ads_txt_query_var' ) );
 		add_action( 'template_redirect', array( $this, 'serve_ads_txt' ), 0 );
+		
+		// Admin Bar Utilities
+		add_action( 'admin_bar_menu', array( $this, 'add_admin_bar_menu' ), 100 );
 	}
 
 
@@ -174,6 +177,10 @@ class Adx_Public {
 	 * Auto Inject Ads In Content.
 	 */
 	public function inject_in_content_ads( $content ) {
+		if ( isset( $_GET['adx_show_positions'] ) && '1' === $_GET['adx_show_positions'] && current_user_can( 'manage_options' ) ) {
+			return $this->inject_placeholder_positions( $content );
+		}
+
 		if ( ! $this->can_render_ads() || empty( $content ) || ! is_string( $content ) ) {
 			return $content;
 		}
@@ -1037,6 +1044,66 @@ class Adx_Public {
 		ob_start();
 		$this->render_side_rails();
 		return ob_get_clean();
+	}
+
+	/**
+	 * Register Admin Bar Menu for AdX Placements.
+	 */
+	public function add_admin_bar_menu( $admin_bar ) {
+		if ( ! current_user_can( 'manage_options' ) || is_admin() ) {
+			return;
+		}
+
+		$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+		$is_showing = isset( $_GET['adx_show_positions'] ) && '1' === $_GET['adx_show_positions'];
+
+		$admin_bar->add_node( array(
+			'id'    => 'adx-ad-inserter',
+			'title' => '<span class="ab-icon dashicons dashicons-layout" style="margin-top:2px;"></span>AdX Ad Inserter',
+			'href'  => admin_url( 'admin.php?page=adx-ad-inserter' ),
+		) );
+
+		if ( $is_showing ) {
+			$url = remove_query_arg( 'adx_show_positions', $current_url );
+			$title = 'Hide Positions';
+		} else {
+			$url = add_query_arg( 'adx_show_positions', '1', $current_url );
+			$title = 'Show Positions';
+		}
+
+		$admin_bar->add_node( array(
+			'parent' => 'adx-ad-inserter',
+			'id'     => 'adx-show-positions',
+			'title'  => $title,
+			'href'   => $url,
+		) );
+	}
+
+	/**
+	 * Inject visual placeholder positions instead of real ads.
+	 */
+	private function inject_placeholder_positions( $content ) {
+		$positions = array(
+			'before_content'   => array( 'Before Content', 1 ),
+			'before_paragraph' => array( 'Before Paragraph', 10 ),
+			'after_paragraph'  => array( 'After Paragraph', 10 ),
+			'before_heading'   => array( 'Before Heading', 5 ),
+			'between_content'  => array( 'Between Content (Middle)', 1 ),
+			'after_content'    => array( 'After Content', 1 ),
+		);
+
+		foreach ( $positions as $type => $info ) {
+			$label_prefix = $info[0];
+			$max_offset   = $info[1];
+			for ( $i = $max_offset; $i >= 1; $i-- ) { // Reverse loop to avoid offset shifting when inserting multiple tags
+				$label = $max_offset > 1 ? "{$label_prefix} {$i}" : $label_prefix;
+				$html  = '<div style="background:#e0f2fe; border:2px dashed #3b82f6; color:#1e40af; font-weight:bold; padding:10px; margin:15px 0; text-align:center; text-transform:uppercase; clear:both; font-family:sans-serif; font-size:13px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">' . esc_html( $label ) . '</div>';
+				
+				$content = Adx_Content_Inserter::insert( $content, $html, $type, $i );
+			}
+		}
+
+		return $content;
 	}
 
 	/**
