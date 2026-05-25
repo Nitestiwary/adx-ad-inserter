@@ -45,6 +45,7 @@
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
+	flex-wrap: nowrap;
 	gap: 24px;
 }
 
@@ -59,6 +60,8 @@
 	display: flex;
 	align-items: center;
 	gap: 12px;
+	flex-shrink: 0;
+	white-space: nowrap;
 }
 
 .settings-title-text {
@@ -87,10 +90,11 @@
 .form-actions {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	flex-wrap: wrap;
+	justify-content: flex-end;
+	flex-wrap: nowrap;
 	gap: 20px;
 	flex: 1;
+	min-width: 0; /* allows flex children to shrink below their implied content size */
 }
 
 .form-toggle {
@@ -159,8 +163,10 @@ input:checked + .slider:before {
 
 /* Head Help Banner */
 .head-banner {
-	max-width: 750px;
+	max-width: 650px;
 	margin: 0 auto;
+	flex: 0 1 auto;
+	min-width: 0;
 }
 
 .head-banner img {
