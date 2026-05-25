@@ -42,8 +42,10 @@
 	margin-bottom: 24px;
 	box-shadow: var(--adx-shadow-lg);
 	display: flex;
-	flex-direction: column;
-	gap: 16px;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
 }
 
 .settings-title {
@@ -69,7 +71,7 @@
 	justify-content: space-between;
 	flex-wrap: wrap;
 	gap: 20px;
-	width: 100%;
+	flex: 1;
 }
 
 .form-toggle {
@@ -138,7 +140,8 @@ input:checked + .slider:before {
 
 /* Head Help Banner */
 .head-banner {
-	max-width: 650px;
+	max-width: 750px;
+	margin: 0 auto;
 }
 
 .head-banner img {
