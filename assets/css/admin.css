@@ -603,6 +603,177 @@ textarea.ad-textarea:focus {
 	to { transform: translateY(0); opacity: 1; }
 }
 
+/* =============================================
+   Right Sidebar – Slot Status Board & Connect
+   ============================================= */
+.settings-sidebar {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	position: sticky;
+	top: 30px;
+}
+
+.settings-sidebar h2 {
+	font-family: 'Outfit', sans-serif;
+	font-size: 1rem;
+	font-weight: 700;
+	color: var(--adx-text);
+	margin: 0 0 12px !important;
+	padding: 0 !important;
+	letter-spacing: -0.01em;
+}
+
+/* Status Board Card */
+.settings-sidebar > aside,
+.settings-sidebar {
+	background: var(--adx-bg-card);
+	border: 1px solid var(--adx-border);
+	border-radius: 16px;
+	padding: 20px;
+	box-shadow: var(--adx-shadow);
+}
+
+.settings-sidebar ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.settings-sidebar ul li {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 7px 0;
+	border-bottom: 1px solid #f1f5f9;
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: var(--adx-text);
+}
+
+.settings-sidebar ul li:last-child {
+	border-bottom: none;
+}
+
+/* Status dot indicators */
+.status-indicator {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	flex-shrink: 0;
+	box-shadow: 0 0 0 2px rgba(0,0,0,0.06);
+}
+
+.status-active {
+	background: var(--adx-success);
+	box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.status-filled {
+	background: var(--adx-warning);
+	box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+.status-empty {
+	background: #cbd5e1;
+}
+
+.status-label {
+	font-size: 0.85rem;
+	font-weight: 500;
+	color: var(--adx-text);
+}
+
+/* Connect with Monetiscope section */
+.links {
+	margin-top: 0;
+}
+
+.links h3 {
+	font-family: 'Outfit', sans-serif;
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: var(--adx-text);
+	margin: 0 0 14px !important;
+	padding: 0 !important;
+}
+
+.social-icons {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 10px;
+}
+
+.social-icons a {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	background: #f8fafc;
+	border: 1px solid var(--adx-border);
+	border-radius: 10px;
+	transition: all 0.2s ease;
+	text-decoration: none !important;
+}
+
+.social-icons a:hover {
+	background: var(--adx-primary-light);
+	border-color: var(--adx-primary);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(99,102,241,0.15);
+}
+
+.social-icons a img {
+	width: 22px !important;
+	height: 22px !important;
+	object-fit: contain;
+	display: block;
+}
+
+/* Status Board Card */
+.sidebar-card {
+	background: var(--adx-bg-card);
+	border: 1px solid var(--adx-border);
+	border-radius: 16px;
+	padding: 20px;
+	box-shadow: var(--adx-shadow);
+}
+
+.sidebar-card h2 {
+	font-family: 'Outfit', sans-serif;
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: var(--adx-text);
+	margin: 0 0 14px !important;
+	padding: 0 !important;
+	letter-spacing: -0.01em;
+	text-transform: uppercase;
+	font-size: 0.75rem;
+	color: var(--adx-text-muted);
+}
+
+/* Status Legend */
+.status-legend {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 12px;
+	padding-top: 10px;
+	border-top: 1px solid #f1f5f9;
+	flex-wrap: wrap;
+}
+
+.status-legend span {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 0.75rem;
+	color: var(--adx-text-muted);
+	font-weight: 500;
+}
+
 @media (max-width: 1024px) {
 	.settings-container {
 		grid-template-columns: 1fr;

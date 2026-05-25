@@ -188,8 +188,11 @@ $status_registry = array(
 				</div>
 			</div>
 
-			<!-- Right Sidebar: Active Status Board & Support -->
-			<aside class="settings-sidebar">
+			<!-- Right Sidebar: Active Status Board & Connect with Monetiscope -->
+		<div class="settings-sidebar">
+
+			<!-- Card 1: Slot Status Board -->
+			<div class="sidebar-card">
 				<h2><?php esc_html_e( 'Slot Status Board', 'adx-ad-inserter' ); ?></h2>
 				<ul>
 					<?php
@@ -282,27 +285,33 @@ $status_registry = array(
 					}
 					?>
 				</ul>
-				
-				<hr style="border: 0; height: 1px; background: #e2e8f0; margin: 20px 0;">
-				
-				<div class="links">
-					<h3><?php esc_html_e( 'Connect with Monetiscope', 'adx-ad-inserter' ); ?></h3>
-					<div class="social-icons">
-						<a href="https://monetiscope.com/" target="_blank" rel="noopener noreferrer" title="Website">
-							<img src="<?php echo esc_url( plugin_dir_url( ADXBYMS_FILE ) . 'assets/img/website2.png' ); ?>" alt="Website">
-						</a>
-						<a href="https://www.linkedin.com/company/monetiscope" target="_blank" rel="noopener noreferrer" title="LinkedIn">
-							<img src="<?php echo esc_url( plugin_dir_url( ADXBYMS_FILE ) . 'assets/img/linkedin2.png' ); ?>" alt="LinkedIn">
-						</a>
-						<a href="https://x.com/monetiscope" target="_blank" rel="noopener noreferrer" title="Twitter/X">
-							<img src="<?php echo esc_url( plugin_dir_url( ADXBYMS_FILE ) . 'assets/img/x2.png' ); ?>" alt="Twitter">
-						</a>
-						<a href="mailto:support@monetiscope.com" title="Support Email">
-							<img src="<?php echo esc_url( plugin_dir_url( ADXBYMS_FILE ) . 'assets/img/email2.png' ); ?>" alt="Email">
-						</a>
-					</div>
+				<div class="status-legend">
+					<span><span class="status-indicator status-active"></span> <?php esc_html_e( 'Active', 'adx-ad-inserter' ); ?></span>
+					<span><span class="status-indicator status-filled"></span> <?php esc_html_e( 'Configured', 'adx-ad-inserter' ); ?></span>
+					<span><span class="status-indicator status-empty"></span> <?php esc_html_e( 'Empty', 'adx-ad-inserter' ); ?></span>
 				</div>
-			</aside>
+			</div>
+
+			<!-- Card 2: Connect with Monetiscope -->
+			<div class="sidebar-card">
+				<h2><?php esc_html_e( 'Connect with Monetiscope', 'adx-ad-inserter' ); ?></h2>
+				<div class="social-icons">
+					<a href="https://monetiscope.com/" target="_blank" rel="noopener noreferrer" title="<?php esc_attr_e( 'Website', 'adx-ad-inserter' ); ?>">
+						<img src="<?php echo esc_url( plugin_dir_url( ADXBYMS_FILE ) . 'assets/img/website2.png' ); ?>" alt="Website">
+					</a>
+					<a href="https://www.linkedin.com/company/monetiscope" target="_blank" rel="noopener noreferrer" title="<?php esc_attr_e( 'LinkedIn', 'adx-ad-inserter' ); ?>">
+						<img src="<?php echo esc_url( plugin_dir_url( ADXBYMS_FILE ) . 'assets/img/linkedin2.png' ); ?>" alt="LinkedIn">
+					</a>
+					<a href="https://x.com/monetiscope" target="_blank" rel="noopener noreferrer" title="<?php esc_attr_e( 'Twitter/X', 'adx-ad-inserter' ); ?>">
+						<img src="<?php echo esc_url( plugin_dir_url( ADXBYMS_FILE ) . 'assets/img/x2.png' ); ?>" alt="Twitter/X">
+					</a>
+					<a href="mailto:support@monetiscope.com" title="<?php esc_attr_e( 'Support Email', 'adx-ad-inserter' ); ?>">
+						<img src="<?php echo esc_url( plugin_dir_url( ADXBYMS_FILE ) . 'assets/img/email2.png' ); ?>" alt="Email">
+					</a>
+				</div>
+			</div>
+
+		</div><!-- .settings-sidebar -->
 		</div>
 	</form>
 </div>
