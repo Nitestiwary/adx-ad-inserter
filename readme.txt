@@ -3,7 +3,7 @@ Contributors: monetiscopeadx
 Donate link: https://monetiscope.com/
 Tags: ads, adsense, ad-manager, google-adx, ad-inserter
 Requires at least: 5.0
-Tested up to: 6.9
+Tested up to: 7.0
 Stable tag: 1.3.1
 Requires PHP: 7.4
 License: GPLv2 or later
