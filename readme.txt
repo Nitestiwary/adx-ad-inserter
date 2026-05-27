@@ -25,6 +25,10 @@ This version introduces **AdX Ad Inserter Premium Updates**, introducing advance
 * **Updated Popup Overlay** - 24-hour rate limit tracking using client-side localStorage, device filter switches, and advanced category/post page targeting options.
 * **Flying Carpet Ads** - 5 parallax scrolling ad blocks with viewport-relative clipping, lazy loading, and smooth CSS acceleration.
 * **Side Rail Ads** - Sticky left and right column rails for screens wider than 1200px. Supports viewability-based dynamic refreshing (min 30s) and close buttons.
+* **Button Rewarded Ads** - Reward users with incentives for watching a short video ad.
+* **Offerwall Ads** - Display an offerwall with multiple offers that generate more revenue.
+* **Header & Footer Ads** - Dedicated slots to appear at the very top or bottom of your pages for maximum visibility.
+* **Interstitial Ads** - Full-page ads shown between content or during page transitions.
 * **Exclude Links & Pages** - Suppress all ad layouts on specific pages using comma-separated paths or queries.
 * **ads.txt Manager (Built-in)** - Edit `/ads.txt` directly from your admin panel. Includes fail-safes and query-vars rewrites.
 
@@ -71,6 +75,9 @@ This version introduces **AdX Ad Inserter Premium Updates**, introducing advance
    * **Popup Ads**: Enter slot path, trigger scroll depth, target screens, and set cap to "one time in 24 hours".
    * **Flying Carpet Ads**: Enable full-screen mobile-optimized parallax slots inside content paragraphs.
    * **Side Rail Ads**: Add a single slot line to automatically float matching left/right columns on desktop screens.
+   * **Rewarded Ads**: Configure video rewarded ad slots and incentive text.
+   * **Offerwall Ads**: Configure offerwall placements to boost user engagement and revenue.
+   * **Header / Footer Ads**: Set up dedicated site-wide header and footer ad banners.
    * **Exclude Links**: Paste comma-separated URLs or paths to block ads on checkout, cart, or landing pages.
 4. Click **Save Changes** and enjoy safe, optimized monetization!
 
