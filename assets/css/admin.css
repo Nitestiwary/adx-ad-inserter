@@ -183,7 +183,7 @@ input:checked + .slider:before {
 
 /* Head Help Banner */
 .head-banner {
-	max-width: 450px;
+	max-width: 600px;
 	margin: 0 auto;
 	flex: 0 1 auto;
 	min-width: 0;
