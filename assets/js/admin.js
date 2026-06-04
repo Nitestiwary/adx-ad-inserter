@@ -5,6 +5,17 @@
 document.addEventListener('DOMContentLoaded', function () {
 	console.log('[AdX] Admin JS Loaded');
 
+	// --- 0. Move WP admin notices out of .wrap so they don't land inside the plugin header ---
+	const wrap = document.querySelector('.wrap');
+	if (wrap) {
+		// Find all notices that WordPress injected inside .wrap
+		const notices = wrap.querySelectorAll('.notice, .updated, .error, .update-nag');
+		notices.forEach(function(notice) {
+			// Insert each notice before the .wrap div in the DOM
+			wrap.parentNode.insertBefore(notice, wrap);
+		});
+	}
+
 	// --- 1. Primary Left Sidebar Tabs Switching ---
 	const tabs = document.querySelectorAll('.adx-nav-tab');
 	const tabContents = document.querySelectorAll('.adx-tab');
