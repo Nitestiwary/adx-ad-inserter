@@ -22,8 +22,7 @@
 }
 
 /* ================================================================
-   Suppress third-party plugin overlays & pointers on our page
-   (SureForms, Rank Math, etc inject floating divs on all admin pages)
+   Suppress third-party plugin overlays, pointers and general notices on our page
    ================================================================ */
 .wp-pointer,
 .wp-pointer-arrow,
@@ -32,7 +31,13 @@
 [class*="sureforms-popup"],
 [class*="sureforms-overlay"],
 [id*="rank-math"],
-[id*="sureforms"] {
+[id*="sureforms"],
+/* Hide general admin notices inside and outside .wrap, except our custom setup notice */
+.toplevel_page_adx-ad-inserter .notice:not(.ms-admin-notice),
+.toplevel_page_adx-ad-inserter .updated,
+.toplevel_page_adx-ad-inserter .error,
+.toplevel_page_adx-ad-inserter .update-nag,
+.toplevel_page_adx-ad-inserter #setting-error-settings_updated {
 	display: none !important;
 }
 
@@ -178,7 +183,7 @@ input:checked + .slider:before {
 
 /* Head Help Banner */
 .head-banner {
-	max-width: 650px;
+	max-width: 450px;
 	margin: 0 auto;
 	flex: 0 1 auto;
 	min-width: 0;

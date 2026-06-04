@@ -264,7 +264,7 @@ class Adx_Admin {
 	public function display_setup_notices() {
 		if ( get_transient( 'ms_setup_success_notice' ) ) {
 			?>
-			<div class="notice notice-success is-dismissible">
+			<div class="notice notice-success is-dismissible ms-admin-notice">
 				<p><strong><?php esc_html_e( 'Thanks for registering with Monetiscope.', 'adx-ad-inserter' ); ?></strong></p>
 			</div>
 			<?php
