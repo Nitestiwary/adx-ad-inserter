@@ -4,7 +4,7 @@ Donate link: https://monetiscope.com/
 Tags: ads, adsense, ad-manager, google-adx, ad-inserter
 Requires at least: 5.0
 Tested up to: 7.0
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -116,6 +116,11 @@ This plugin enqueues the following external script resources:
   * **Privacy**: [Zapier Privacy Policy](https://zapier.com/privacy).
 
 == Changelog ==
+
+= 1.3.2 =
+* Fixed: Third-party plugin popups (SureForms, Rank Math, etc.) no longer appear inside the plugin admin page. All foreign admin notices and dynamically-injected overlays are now suppressed using PHP output buffering and a JavaScript MutationObserver.
+* Fixed: WordPress admin pointers (wp-pointer) are dequeued on the plugin page to prevent overlap.
+* Improved: "Already have an account? Sign In" link added to the setup modal for returning users.
 
 = 1.3.1 =
 * Added: First-time setup onboarding system to seamlessly register users with Monetiscope for priority support, updates, and optimization tools.

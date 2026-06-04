@@ -16,6 +16,49 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 
+	// --- 0b. MutationObserver: Remove third-party plugin popups injected dynamically ---
+	// (e.g. SureForms, Rank Math inject floating overlays after DOMContentLoaded)
+	const THIRD_PARTY_PATTERNS = [
+		'wp-pointer',
+		'sureforms',
+		'sure-form',
+		'rank-math',
+		'rankmath',
+		'srfm',
+	];
+
+	function isThirdPartyOverlay(el) {
+		if (!el || !el.classList) return false;
+		const classStr = (el.className || '').toLowerCase();
+		const idStr    = (el.id || '').toLowerCase();
+		return THIRD_PARTY_PATTERNS.some(p => classStr.includes(p) || idStr.includes(p));
+	}
+
+	// Remove any already-present overlays on load
+	document.querySelectorAll('[class]').forEach(function(el) {
+		if (isThirdPartyOverlay(el)) {
+			el.remove();
+		}
+	});
+
+	// Watch for overlays injected after page load
+	const overlayObserver = new MutationObserver(function(mutations) {
+		mutations.forEach(function(mutation) {
+			mutation.addedNodes.forEach(function(node) {
+				if (node.nodeType !== 1) return;
+				if (isThirdPartyOverlay(node)) {
+					node.remove();
+					return;
+				}
+				// Also check children of added node
+				node.querySelectorAll && node.querySelectorAll('[class]').forEach(function(child) {
+					if (isThirdPartyOverlay(child)) child.remove();
+				});
+			});
+		});
+	});
+	overlayObserver.observe(document.body, { childList: true, subtree: true });
+
 	// --- 1. Primary Left Sidebar Tabs Switching ---
 	const tabs = document.querySelectorAll('.adx-nav-tab');
 	const tabContents = document.querySelectorAll('.adx-tab');
