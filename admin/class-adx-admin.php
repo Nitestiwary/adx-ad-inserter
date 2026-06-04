@@ -20,6 +20,7 @@ class Adx_Admin {
 		add_action( 'admin_init', array( $this, 'handle_setup_registration' ) );
 		add_action( 'admin_notices', array( $this, 'display_setup_notices' ) );
 		add_action( 'wp_ajax_ms_setup_remind_later', array( $this, 'ajax_remind_later' ) );
+		add_action( 'wp_ajax_ms_setup_already_registered', array( $this, 'ajax_already_registered' ) );
 	}
 
 
@@ -254,6 +255,20 @@ class Adx_Admin {
 		}
 
 		update_option( 'ms_setup_remind_later_time', time() );
+		wp_send_json_success();
+	}
+
+	/**
+	 * Handle "Already Registered" AJAX action.
+	 */
+	public function ajax_already_registered() {
+		check_ajax_referer( 'ms_setup_nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+		}
+
+		update_option( 'ms_setup_completed', '1' );
 		wp_send_json_success();
 	}
 

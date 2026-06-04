@@ -35,6 +35,9 @@ $registration_url = "https://monetiscope.com/register/?site_url={$site_url}&retu
 			<button type="button" id="ms-setup-remind-later" class="button button-secondary ms-setup-btn-secondary">
 				<?php esc_html_e( 'Remind Me Later', 'adx-ad-inserter' ); ?>
 			</button>
+			<button type="button" id="ms-setup-already-registered" class="button button-link" style="margin-top:10px; display:block; text-align:center; width:100%; text-decoration:none;">
+				<?php esc_html_e( 'I already have an account', 'adx-ad-inserter' ); ?>
+			</button>
 		</div>
 	</div>
 </div>

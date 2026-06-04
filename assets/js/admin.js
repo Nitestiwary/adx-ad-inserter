@@ -188,17 +188,18 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (setupOverlay) {
 		const remindBtn = document.getElementById('ms-setup-remind-later');
 		const closeBtn = document.getElementById('ms-setup-close');
+		const alreadyBtn = document.getElementById('ms-setup-already-registered');
 
-		function dismissSetup() {
+		function dismissSetup(actionName = 'ms_setup_remind_later') {
 			setupOverlay.style.opacity = '0';
 			setTimeout(() => {
 				setupOverlay.style.display = 'none';
 			}, 300);
 
-			// AJAX call to save "Remind Me Later" time
+			// AJAX call
 			if (typeof adxbyms_strings !== 'undefined' && adxbyms_strings.ajaxUrl) {
 				jQuery.post(adxbyms_strings.ajaxUrl, {
-					action: 'ms_setup_remind_later',
+					action: actionName,
 					nonce: adxbyms_strings.setupNonce
 				});
 			}
@@ -207,14 +208,21 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (remindBtn) {
 			remindBtn.addEventListener('click', function(e) {
 				e.preventDefault();
-				dismissSetup();
+				dismissSetup('ms_setup_remind_later');
+			});
+		}
+
+		if (alreadyBtn) {
+			alreadyBtn.addEventListener('click', function(e) {
+				e.preventDefault();
+				dismissSetup('ms_setup_already_registered');
 			});
 		}
 
 		if (closeBtn) {
 			closeBtn.addEventListener('click', function(e) {
 				e.preventDefault();
-				dismissSetup();
+				dismissSetup('ms_setup_remind_later');
 			});
 		}
 	}
