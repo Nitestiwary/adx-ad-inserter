@@ -1,7 +1,7 @@
 === AdX Ad Inserter - Adsense and Ad Manager Ads ===
 Contributors: monetiscopeadx
 Donate link: https://monetiscope.com/
-Tags: adx-ads, gam-ads, ads-txt, ad-placement, header-footer, ads, adsense, ad-manager, google-adx, ad-inserter, ads-txt-manager, advance-ads, rewarded-ad, popup-ad, offerwall-ad, exclude-link, display-ad, responsive-ad
+Tags: ad-inserter, ad-manager, ads, adsense, header-footer, adx-ads, ad-placement, gam-ads, ads-txt-manager, ads-txt, advance-ads, rewarded-ad, popup-ad, offerwall-ad, exclude-link, display-ad, responsive-ad, google-adx
 Requires at least: 5.0
 Tested up to: 7.0
 Stable tag: 1.3.2
