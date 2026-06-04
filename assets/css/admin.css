@@ -21,6 +21,21 @@
 	--adx-shadow-lg: 0 10px 15px -3px rgba(99, 102, 241, 0.05), 0 4px 6px -2px rgba(99, 102, 241, 0.03);
 }
 
+/* ================================================================
+   Suppress third-party plugin overlays & pointers on our page
+   (SureForms, Rank Math, etc inject floating divs on all admin pages)
+   ================================================================ */
+.wp-pointer,
+.wp-pointer-arrow,
+[class*="rank-math-notice"],
+[class*="sureforms-notice"],
+[class*="sureforms-popup"],
+[class*="sureforms-overlay"],
+[id*="rank-math"],
+[id*="sureforms"] {
+	display: none !important;
+}
+
 .wrap {
 	max-width: 1300px;
 	margin: 30px auto;

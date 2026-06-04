@@ -17,6 +17,7 @@ class Adx_Admin {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'add_settings_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'suppress_third_party_overlays' ), 100 );
 		add_action( 'admin_init', array( $this, 'handle_setup_registration' ) );
 		add_action( 'admin_notices', array( $this, 'display_setup_notices' ) );
 		add_action( 'wp_ajax_ms_setup_remind_later', array( $this, 'ajax_remind_later' ) );
@@ -242,6 +243,27 @@ class Adx_Admin {
 			<?php
 			delete_transient( 'ms_setup_success_notice' );
 		}
+	}
+
+	/**
+	 * Suppress third-party plugin pointer popups and overlays on our plugin page.
+	 * Other plugins (e.g. SureForms, Rank Math) inject floating overlays into every
+	 * admin page. We dequeue their pointer scripts on our own page to keep the UI clean.
+	 *
+	 * @param string $hook Current admin page hook.
+	 */
+	public function suppress_third_party_overlays( $hook ) {
+		$our_page    = 'toplevel_page_adx-ad-inserter';
+		$is_our_page = ( $our_page === $hook ) ||
+		               ( isset( $_GET['page'] ) && 'adx-ad-inserter' === $_GET['page'] );
+
+		if ( ! $is_our_page ) {
+			return;
+		}
+
+		// Dequeue WordPress core admin pointer scripts (used by many plugins for overlays).
+		wp_dequeue_script( 'wp-pointer' );
+		wp_dequeue_style( 'wp-pointer' );
 	}
 
 	/**
