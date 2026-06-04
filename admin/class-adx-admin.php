@@ -19,12 +19,10 @@ class Adx_Admin {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'suppress_third_party_overlays' ), 100 );
 		add_action( 'admin_init', array( $this, 'handle_setup_registration' ) );
-		// Suppress all third-party admin notices on our page using output buffering.
-		// Priority -100 = starts buffer before any notice outputs; PHP_INT_MAX = discards all captured content.
+		// Suppress ALL third-party admin notices on our page using output buffering.
+		// notices_buffer_end discards everything, then directly outputs our own notice.
 		add_action( 'admin_notices', array( $this, 'notices_buffer_start' ), -100 );
 		add_action( 'admin_notices', array( $this, 'notices_buffer_end' ), PHP_INT_MAX );
-		// Re-add our own notice at a normal priority, rendered after buffer is flushed.
-		add_action( 'admin_notices', array( $this, 'display_setup_notices' ), 5 );
 		add_action( 'wp_ajax_ms_setup_remind_later', array( $this, 'ajax_remind_later' ) );
 		add_action( 'wp_ajax_ms_setup_already_registered', array( $this, 'ajax_already_registered' ) );
 	}
@@ -255,7 +253,9 @@ class Adx_Admin {
 		if ( ! isset( $_GET['page'] ) || 'adx-ad-inserter' !== $_GET['page'] ) {
 			return;
 		}
-		ob_end_clean();
+		ob_end_clean(); // Discard ALL captured third-party notices.
+		// Now output our own notice directly, outside the buffer scope.
+		$this->display_setup_notices();
 	}
 
 	/**
