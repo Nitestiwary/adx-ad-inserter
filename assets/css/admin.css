@@ -887,3 +887,15 @@ textarea.ad-textarea:focus {
 .ms-setup-btn-primary:hover {
 	background: #2563eb !important;
 }
+.ms-setup-signin-link {
+	display: block;
+	text-align: center;
+	font-size: 0.85rem;
+	color: #6b7280;
+	text-decoration: underline;
+	margin-top: 4px;
+	cursor: pointer;
+}
+.ms-setup-signin-link:hover {
+	color: #3b82f6;
+}
