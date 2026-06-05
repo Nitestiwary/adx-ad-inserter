@@ -60,7 +60,7 @@ defined( 'ABSPATH' ) || exit;
 					<label style="font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
 						<input type="hidden" name="adxbyms_flying_carpet_block_<?php echo esc_attr( $i ); ?>_enabled" value="false" />
 						<input type="checkbox" name="adxbyms_flying_carpet_block_<?php echo esc_attr( $i ); ?>_enabled" value="true" <?php checked( $enabled, true ); ?> />
-						<?php esc_html_e( 'Block Active', 'adx-ad-inserter' ); ?>
+						<?php esc_html_e( 'Enable', 'adx-ad-inserter' ); ?>
 					</label>
 				</div>
 
