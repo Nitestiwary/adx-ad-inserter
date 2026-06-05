@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	function isThirdPartyOverlay(el) {
 		if (!el || !el.classList) return false;
-		const classStr = (el.className || '').toLowerCase();
+		const classStr = (typeof el.className === 'string' ? el.className : el.getAttribute('class') || '').toLowerCase();
 		const idStr    = (el.id || '').toLowerCase();
 		return THIRD_PARTY_PATTERNS.some(p => classStr.includes(p) || idStr.includes(p));
 	}
