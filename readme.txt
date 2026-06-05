@@ -4,7 +4,7 @@ Donate link: https://monetiscope.com/
 Tags: ad-inserter, ad-manager, ads, adsense, header-footer, adx-ads, ad-placement, gam-ads, ads-txt-manager, ads-txt, advance-ads, rewarded-ad, popup-ad, offerwall-ad, exclude-link, display-ad, responsive-ad, google-adx
 Requires at least: 5.0
 Tested up to: 7.0
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -116,6 +116,10 @@ This plugin enqueues the following external script resources:
   * **Privacy**: [Zapier Privacy Policy](https://zapier.com/privacy).
 
 == Changelog ==
+
+= 1.3.3 =
+* Fixed: Resolved a JavaScript TypeError (className.toLowerCase is not a function) when processing SVG elements on page load, which was causing the settings page to render blank on some publisher websites.
+* Improved: Updated and synchronized the directory assets banner images.
 
 = 1.3.2 =
 * Fixed: Third-party plugin popups (SureForms, Rank Math, etc.) no longer appear inside the plugin admin page. All foreign admin notices and dynamically-injected overlays are now suppressed using PHP output buffering and a JavaScript MutationObserver.

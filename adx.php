@@ -4,7 +4,7 @@
  * Plugin URI: https://monetiscope.com/adx-ad-inserter-plugin/
  * Description: Insert Google AdX, Ad Manager, popup, rewarded, sticky, and in-content ads with precise placement controls. Built-in ads.txt editor.
  * Author: Monetiscope
- * Version: 1.3.2
+ * Version: 1.3.3
  * Author URI: https://monetiscope.com
  * Requires at least: 5.0
  * Tested up to: 7.0
