@@ -193,7 +193,23 @@ class Adx_Public {
 	 * Auto Inject Ads In Content.
 	 */
 	public function inject_in_content_ads( $content ) {
-		if ( isset( $_GET['adx_show_positions'] ) && '1' === $_GET['adx_show_positions'] && current_user_can( 'manage_options' ) ) {
+		$show_positions = false;
+		if ( isset( $_GET['adx_show_positions'] ) ) {
+			if ( '1' === $_GET['adx_show_positions'] ) {
+				setcookie( 'adx_show_positions', '1', time() + 3600, COOKIEPATH, COOKIE_DOMAIN );
+				$_COOKIE['adx_show_positions'] = '1';
+				$show_positions = true;
+			} else {
+				setcookie( 'adx_show_positions', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN );
+				if ( isset( $_COOKIE['adx_show_positions'] ) ) {
+					unset( $_COOKIE['adx_show_positions'] );
+				}
+			}
+		} elseif ( isset( $_COOKIE['adx_show_positions'] ) && '1' === $_COOKIE['adx_show_positions'] ) {
+			$show_positions = true;
+		}
+
+		if ( $show_positions && current_user_can( 'manage_options' ) ) {
 			return $this->inject_placeholder_positions( $content );
 		}
 
@@ -1071,7 +1087,7 @@ class Adx_Public {
 		}
 
 		$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
-		$is_showing = isset( $_GET['adx_show_positions'] ) && '1' === $_GET['adx_show_positions'];
+		$is_showing = ( isset( $_GET['adx_show_positions'] ) && '1' === $_GET['adx_show_positions'] ) || ( ! isset( $_GET['adx_show_positions'] ) && isset( $_COOKIE['adx_show_positions'] ) && '1' === $_COOKIE['adx_show_positions'] );
 
 		$admin_bar->add_node( array(
 			'id'    => 'adx-ad-inserter',
@@ -1080,7 +1096,7 @@ class Adx_Public {
 		) );
 
 		if ( $is_showing ) {
-			$url = remove_query_arg( 'adx_show_positions', $current_url );
+			$url = add_query_arg( 'adx_show_positions', '0', $current_url );
 			$title = 'Hide Positions';
 		} else {
 			$url = add_query_arg( 'adx_show_positions', '1', $current_url );
