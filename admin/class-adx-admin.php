@@ -108,6 +108,7 @@ class Adx_Admin {
 			register_setting( 'adxbyms_settings', "adxbyms_slot_{$i}_text", array( 'sanitize_callback' => 'sanitize_text_field' ) );
 			register_setting( 'adxbyms_settings', "adxbyms_slot_{$i}_offset", array( 'sanitize_callback' => 'sanitize_text_field' ) );
 			register_setting( 'adxbyms_settings', "adxbyms_slot_{$i}_devices", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
+			register_setting( 'adxbyms_settings', "adxbyms_slot_{$i}_show_label", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
 		}
 
 		// Register 10 custom adsense blocks
@@ -130,6 +131,7 @@ class Adx_Admin {
 			register_setting( 'adxbyms_settings', "adxbyms_responsive_block_{$i}_alignment", array( 'sanitize_callback' => 'sanitize_text_field' ) );
 			register_setting( 'adxbyms_settings', "adxbyms_responsive_block_{$i}_pages", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
 			register_setting( 'adxbyms_settings', "adxbyms_responsive_block_{$i}_devices", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
+			register_setting( 'adxbyms_settings', "adxbyms_responsive_block_{$i}_show_label", array( 'sanitize_callback' => array( $this, 'sanitize_option' ) ) );
 		}
 
 		// Register 5 flying carpet ad blocks

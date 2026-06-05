@@ -228,6 +228,7 @@ class Adx_Public {
 				$alignment = get_option( "adxbyms_slot_{$i}_alignment", 'center' );
 				$pages     = (array) get_option( "adxbyms_slot_{$i}_pages", array() );
 				$devices   = (array) get_option( "adxbyms_slot_{$i}_devices", array() );
+				$show_label = ( 'true' === get_option( "adxbyms_slot_{$i}_show_label" ) );
 
 				if ( ! $enabled || empty( $network ) || empty( $sizes ) ) {
 					continue;
@@ -245,6 +246,9 @@ class Adx_Public {
 				if ( in_array( $insertion, array( 'before_html', 'inside_html', 'after_html' ), true ) ) {
 					$div_id  = 'div-gpt-ad-slot-html-' . $i . '-' . uniqid();
 					$ad_html = Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment );
+					if ( $show_label ) {
+						$ad_html = '<div class="adx-advertisement-label" style="text-align:center; font-size:12px; color:#64748b; margin-bottom:4px; font-family:sans-serif; width:100%; clear:both;">---Advertisement---</div>' . $ad_html;
+					}
 					$placeholder = '<div class="adxbyms-html-placeholder" data-selector="' . esc_attr( $offset ) . '" data-action="' . esc_attr( $insertion ) . '" style="display:none;">' . $ad_html . '</div>';
 					$content .= $placeholder;
 					continue;
@@ -252,6 +256,9 @@ class Adx_Public {
 
 				$div_id  = 'div-gpt-ad-slot-' . $i . '-' . uniqid();
 				$ad_html = Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment );
+				if ( $show_label ) {
+					$ad_html = '<div class="adx-advertisement-label" style="text-align:center; font-size:12px; color:#64748b; margin-bottom:4px; font-family:sans-serif; width:100%; clear:both;">---Advertisement---</div>' . $ad_html;
+				}
 				$content = Adx_Content_Inserter::insert( $content, $ad_html, $insertion, absint( $offset ) );
 			}
 		}
@@ -297,6 +304,7 @@ class Adx_Public {
 				$alignment = get_option( "adxbyms_responsive_block_{$i}_alignment", 'center' );
 				$devices   = (array) get_option( "adxbyms_responsive_block_{$i}_devices", array() );
 				$pages     = (array) get_option( "adxbyms_responsive_block_{$i}_pages", array() );
+				$show_label = ( 'true' === get_option( "adxbyms_responsive_block_{$i}_show_label" ) );
 
 				if ( ! $enabled || empty( $network ) || in_array( $insertion, array( 'manual', 'before_excerpt', 'after_excerpt', 'before_comments', 'between_comments', 'after_comments', 'footer' ), true ) ) {
 					continue;
@@ -308,12 +316,18 @@ class Adx_Public {
 
 				if ( in_array( $insertion, array( 'before_html', 'inside_html', 'after_html' ), true ) ) {
 					$ad_html = $this->build_responsive_gpt_ad( $network, $i, $alignment );
+					if ( $show_label ) {
+						$ad_html = '<div class="adx-advertisement-label" style="text-align:center; font-size:12px; color:#64748b; margin-bottom:4px; font-family:sans-serif; width:100%; clear:both;">---Advertisement---</div>' . $ad_html;
+					}
 					$placeholder = '<div class="adxbyms-html-placeholder" data-selector="' . esc_attr( $offset ) . '" data-action="' . esc_attr( $insertion ) . '" style="display:none;">' . $ad_html . '</div>';
 					$content .= $placeholder;
 					continue;
 				}
 
 				$ad_html = $this->build_responsive_gpt_ad( $network, $i, $alignment );
+				if ( $show_label ) {
+					$ad_html = '<div class="adx-advertisement-label" style="text-align:center; font-size:12px; color:#64748b; margin-bottom:4px; font-family:sans-serif; width:100%; clear:both;">---Advertisement---</div>' . $ad_html;
+				}
 				$content = Adx_Content_Inserter::insert( $content, $ad_html, $insertion, absint( $offset ) );
 			}
 		}
@@ -364,6 +378,7 @@ class Adx_Public {
 			$alignment = get_option( "adxbyms_slot_{$i}_alignment", 'center' );
 			$pages     = (array) get_option( "adxbyms_slot_{$i}_pages", array() );
 			$devices   = (array) get_option( "adxbyms_slot_{$i}_devices", array() );
+			$show_label = ( 'true' === get_option( "adxbyms_slot_{$i}_show_label" ) );
 
 			if ( ! $enabled || empty( $network ) || empty( $sizes ) || 'before_post' !== $insertion ) {
 				continue;
@@ -374,7 +389,11 @@ class Adx_Public {
 			}
 
 			$div_id  = 'div-gpt-ad-slot-before-' . $i;
-			echo Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			$ad_html = Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment );
+			if ( $show_label ) {
+				$ad_html = '<div class="adx-advertisement-label" style="text-align:center; font-size:12px; color:#64748b; margin-bottom:4px; font-family:sans-serif; width:100%; clear:both;">---Advertisement---</div>' . $ad_html;
+			}
+			echo $ad_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 
@@ -397,6 +416,7 @@ class Adx_Public {
 			$alignment = get_option( "adxbyms_slot_{$i}_alignment", 'center' );
 			$pages     = (array) get_option( "adxbyms_slot_{$i}_pages", array() );
 			$devices   = (array) get_option( "adxbyms_slot_{$i}_devices", array() );
+			$show_label = ( 'true' === get_option( "adxbyms_slot_{$i}_show_label" ) );
 
 			if ( ! $enabled || empty( $network ) || empty( $sizes ) || 'after_post' !== $insertion ) {
 				continue;
@@ -407,7 +427,11 @@ class Adx_Public {
 			}
 
 			$div_id  = 'div-gpt-ad-slot-after-' . $i;
-			echo Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			$ad_html = Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment );
+			if ( $show_label ) {
+				$ad_html = '<div class="adx-advertisement-label" style="text-align:center; font-size:12px; color:#64748b; margin-bottom:4px; font-family:sans-serif; width:100%; clear:both;">---Advertisement---</div>' . $ad_html;
+			}
+			echo $ad_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 
@@ -443,7 +467,7 @@ class Adx_Public {
 				}
 
 				$div_id  = 'div-gpt-ad-slot-ex-' . $i . '-' . uniqid();
-				$ad_html = Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment );
+				$ad_html = $this->build_display_gpt_ad( $network, $sizes, $div_id, $alignment, $i );
 
 				if ( 'before_excerpt' === $insertion ) {
 					$excerpt = $ad_html . $excerpt;
@@ -562,7 +586,7 @@ class Adx_Public {
 				if ( $enabled && ! empty( $network ) && ! empty( $sizes ) && 'between_comments' === $insertion && (int) $offset === absint( $ad_offset ) ) {
 					if ( $this->check_page_types( $pages ) && Adx_Device::matches( $devices ) ) {
 						$div_id  = 'div-gpt-ad-slot-bc-' . $i . '-' . uniqid();
-						$ad_html = Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment );
+						$ad_html = $this->build_display_gpt_ad( $network, $sizes, $div_id, $alignment, $i );
 						$comment_text .= $ad_html;
 					}
 				}
@@ -630,7 +654,8 @@ class Adx_Public {
 				if ( $enabled && ! empty( $network ) && ! empty( $sizes ) && $insertion_type === $insertion ) {
 					if ( $this->check_page_types( $pages ) && Adx_Device::matches( $devices ) ) {
 						$div_id  = 'div-gpt-ad-slot-cm-' . $i . '-' . uniqid();
-						echo Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						$ad_html = $this->build_display_gpt_ad( $network, $sizes, $div_id, $alignment, $i );
+						echo $ad_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 				}
 			}
@@ -705,7 +730,13 @@ class Adx_Public {
 		// GAM maps both size categories
 		$sizes = array( '728x90', '300x250' );
 
-		return Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment, $mapping_js );
+		$ad_html = Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment, $mapping_js );
+		
+		$show_label = ( 'true' === get_option( "adxbyms_responsive_block_{$index}_show_label" ) );
+		if ( $show_label ) {
+			$ad_html = '<div class="adx-advertisement-label" style="text-align:center; font-size:12px; color:#64748b; margin-bottom:4px; font-family:sans-serif; width:100%; clear:both;">---Advertisement---</div>' . $ad_html;
+		}
+		return $ad_html;
 	}
 
 	/**
@@ -981,7 +1012,7 @@ class Adx_Public {
 		}
 
 		$div_id = 'ms-display-ad-sc-' . $id . '-' . uniqid();
-		return Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $align );
+		return $this->build_display_gpt_ad( $network, $sizes, $div_id, $align, $id );
 	}
 
 	public function render_custom_ad_shortcode( $atts ) {
@@ -1221,6 +1252,18 @@ class Adx_Public {
 		header( 'Expires: 0' );
 		echo rtrim( $code, "\r\n" ) . "\n";
 		exit;
+	}
+
+	/**
+	 * Build Display GPT ad with optional advertisement label.
+	 */
+	private function build_display_gpt_ad( $network, $sizes, $div_id, $alignment, $i ) {
+		$ad_html = Adx_Gpt_Manager::get_instance()->render_gpt_slot( $network, $sizes, $div_id, $alignment );
+		$show_label = ( 'true' === get_option( "adxbyms_slot_{$i}_show_label" ) );
+		if ( $show_label ) {
+			$ad_html = '<div class="adx-advertisement-label" style="text-align:center; font-size:12px; color:#64748b; margin-bottom:4px; font-family:sans-serif; width:100%; clear:both;">---Advertisement---</div>' . $ad_html;
+		}
+		return $ad_html;
 	}
 }
 

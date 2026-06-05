@@ -57,11 +57,19 @@ defined( 'ABSPATH' ) || exit;
 						<?php printf( esc_html__( 'Responsive Ad Block %d Options', 'adx-ad-inserter' ), (int) $i ); ?>
 					</h3>
 					
-					<label style="font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-						<input type="hidden" name="adxbyms_responsive_block_<?php echo esc_attr( $i ); ?>_enabled" value="false" />
-						<input type="checkbox" name="adxbyms_responsive_block_<?php echo esc_attr( $i ); ?>_enabled" value="true" <?php checked( $enabled, true ); ?> />
-						<?php esc_html_e( 'Block Active', 'adx-ad-inserter' ); ?>
-					</label>
+					<div style="display:flex; gap: 20px; align-items: center;">
+						<label style="font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+							<input type="hidden" name="adxbyms_responsive_block_<?php echo esc_attr( $i ); ?>_show_label" value="false" />
+							<input type="checkbox" name="adxbyms_responsive_block_<?php echo esc_attr( $i ); ?>_show_label" value="true" <?php checked( get_option( "adxbyms_responsive_block_{$i}_show_label" ), 'true' ); ?> />
+							<?php esc_html_e( 'Show Advertisement Label', 'adx-ad-inserter' ); ?>
+						</label>
+
+						<label style="font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+							<input type="hidden" name="adxbyms_responsive_block_<?php echo esc_attr( $i ); ?>_enabled" value="false" />
+							<input type="checkbox" name="adxbyms_responsive_block_<?php echo esc_attr( $i ); ?>_enabled" value="true" <?php checked( $enabled, true ); ?> />
+							<?php esc_html_e( 'Block Active', 'adx-ad-inserter' ); ?>
+						</label>
+					</div>
 				</div>
 
 				<!-- Ad Slot Path -->
