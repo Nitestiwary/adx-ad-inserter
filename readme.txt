@@ -4,7 +4,7 @@ Donate link: https://monetiscope.com/
 Tags: ad-inserter, ad-manager, ads, adsense, header-footer
 Requires at least: 5.0
 Tested up to: 7.0
-Stable tag: 1.3.3
+Stable tag: 1.3.6
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -116,6 +116,21 @@ This plugin enqueues the following external script resources:
   * **Privacy**: [Zapier Privacy Policy](https://zapier.com/privacy).
 
 == Changelog ==
+
+= 1.3.6 =
+* Fixed: Overhauled pop-up ads script to use a non-blocking container with background scrolling and page navigation support.
+* Fixed: Button Rewarded ad to correctly resume downloads and dynamic redirects after the ad is watched.
+
+= 1.3.5 =
+* Fixed: Made pop-up ads overlay background transparent.
+* Improved: Enabled background page navigation and scrolling while the pop-up ad is displayed to enhance user experience.
+
+= 1.3.4 =
+* Added: An "Advertisement Label" option for Display and Responsive ad blocks. When enabled, it renders a center-aligned label ("---Advertisement---") just before the ad to minimize accidental clicks.
+* Improved: Reordered option layout in the settings dashboard (Enable first, followed by Advertisement Label).
+* Improved: Renamed "Block Active" label to "Enable" globally across all ad format sections.
+* Improved: Fixed "Show Positions" tool in admin bar to persist settings using cookies, preventing SEO plugins and redirection rules from stripping URL query parameters.
+* Optimized: Reduced plugin package size by 70% by removing unused screenshots and large banners from the plugin directory to prevent server upload limit errors (such as upload_max_filesize).
 
 = 1.3.3 =
 * Fixed: Resolved a JavaScript TypeError (className.toLowerCase is not a function) when processing SVG elements on page load, which was causing the settings page to render blank on some publisher websites.

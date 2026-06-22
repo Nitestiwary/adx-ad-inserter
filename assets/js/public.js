@@ -8,16 +8,17 @@
 	$(document).ready(function () {
 		console.log('[AdX] Public JS Active');
 
-		// --- 1. Popup Ad Module with 24-Hour and Session Capping (Feature 4) ---
+		// --- 1. Popup Ad Module with Capping and Dynamic Injection ---
 		const popupModule = {
 			config: window.ADXBYMS_POPUP_DATA || {},
 			sessionKey: 'adxbyms_popup_session_shown',
 			localKey: 'adxbyms_popup_24h_shown',
-			overlay: $('#adxbyms-popup-overlay'),
-			adRequested: false,
+			adDisplayed: false,
+			adLoaded: false,
+			gptLoaded: false,
 
 			init: function () {
-				if (!this.overlay.length || !this.config.network_code) {
+				if (!this.config.network_code) {
 					return;
 				}
 
@@ -26,25 +27,26 @@
 					return;
 				}
 
+				// Pre-create popup container (no GPT script loaded yet for speed)
+				this.createPopup();
+
 				// Hook scroll listener with passive option
 				window.addEventListener('scroll', this.onScroll.bind(this), { passive: true });
 			},
 
 			isCapped: function () {
-				// Session cap check
 				if (this.config.frequency === 'session') {
 					if (sessionStorage.getItem(this.sessionKey) === 'true') {
 						return true;
 					}
 				}
 
-				// 24 Hour local storage cap check
 				if (this.config.frequency === '24h') {
 					const lastShown = localStorage.getItem(this.localKey);
 					if (lastShown) {
 						const diff = Date.now() - parseInt(lastShown, 10);
 						if (diff < 24 * 60 * 60 * 1000) {
-							return true; // Capped
+							return true;
 						}
 					}
 				}
@@ -60,84 +62,118 @@
 				}
 			},
 
-			onScroll: function () {
-				if (this.adRequested) return;
-
-				const st = window.scrollY || document.documentElement.scrollTop || 0;
-				const vh = window.innerHeight || 0;
-				const dh = Math.max(
-					document.documentElement.scrollHeight || 0,
-					document.body ? document.body.scrollHeight : 0
-				);
-				const maxScroll = Math.max(dh - vh, 1);
-				const currentPercent = st / maxScroll;
-
-				const triggerPercent = this.config.scroll_trigger || 0.6;
-
-				if (currentPercent >= triggerPercent) {
-					this.displayPopup();
+			loadGPT: function (callback) {
+				if (this.gptLoaded || (window.googletag && window.googletag.apiReady)) {
+					this.gptLoaded = true;
+					callback();
+					return;
 				}
+
+				if (!window.googletag) {
+					window.googletag = { cmd: [] };
+				}
+
+				const gptScript = document.createElement("script");
+				gptScript.src = "https://securepubads.g.doubleclick.net/tag/js/gpt.js";
+				gptScript.async = true;
+
+				gptScript.onload = () => {
+					this.gptLoaded = true;
+					callback();
+				};
+
+				document.head.appendChild(gptScript);
 			},
 
-			displayPopup: function () {
-				this.adRequested = true;
-				this.setCapped();
+			createPopup: function () {
+				let adPopup = document.getElementById("ad-popup");
+				if (adPopup) return adPopup;
 
-				// Fade overlay
-				this.overlay.css('display', 'flex');
-				setTimeout(() => {
-					this.overlay.addClass('show');
-				}, 50);
+				adPopup = document.createElement("div");
+				adPopup.id = "ad-popup";
+				adPopup.innerHTML = `
+					<div id="popup-inner">
+						<div id="close-popup">×</div>
+						<div id="ad-slot"></div>
+					</div>
+				`;
+				document.body.appendChild(adPopup);
 
-				// Request slot render
+				// Non-blocking transparent container styles
+				adPopup.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100vh;display:none;justify-content:center;align-items:center;background:transparent;z-index:999999;pointer-events:none;";
+				
+				const inner = document.getElementById("popup-inner");
+				inner.style.cssText = "position:relative;pointer-events:auto;";
+
+				const closeBtn = document.getElementById("close-popup");
+				closeBtn.style.cssText = "position:absolute;top:-10px;right:-10px;width:26px;height:26px;background:#000;color:#fff;font-size:16px;display:flex;justify-content:center;align-items:center;cursor:pointer;border-radius:50%;z-index:2;";
+
+				const adBox = document.getElementById("ad-slot");
+				adBox.style.cssText = "width:300px;height:250px;background:transparent;border-radius:4px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.3);";
+
+				closeBtn.onclick = () => {
+					adPopup.style.display = "none";
+				};
+
+				return adPopup;
+			},
+
+			setupAd: function (adPopup) {
 				window.googletag = window.googletag || { cmd: [] };
-				window.googletag.cmd.push(() => {
-					try {
-						// Register popup slot dynamically
-						const slotId = 'adxbyms-popup-slot-div';
-						const slot = googletag.defineSlot(
-							this.config.network_code,
-							[[300, 250], [336, 280], [300, 280], [250, 250], [200, 200]],
-							slotId
-						).addService(googletag.pubads());
+				googletag.cmd.push(() => {
+					googletag.pubads().set("page_url", window.location.href);
+					googletag.pubads().collapseEmptyDivs();
 
-						googletag.pubads().set('page_url', window.location.href);
+					const slot = googletag.defineSlot(
+						this.config.network_code,
+						[[300, 250], [336, 280], [300, 280], [250, 250], [200, 200]],
+						"ad-slot"
+					).addService(googletag.pubads());
 
-						// Handle slot load callback to hide if ad is empty (GAM standard check)
-						googletag.pubads().addEventListener('slotRenderEnded', (e) => {
-							if (e.slot === slot && e.isEmpty) {
-								this.closePopup();
+					googletag.enableServices();
+
+					googletag.pubads().addEventListener("slotRenderEnded", (event) => {
+						if (event.slot === slot) {
+							if (event.isEmpty) {
+								adPopup.style.display = "none";
+							} else {
+								this.adLoaded = true;
 							}
-						});
-
-						googletag.enableServices();
-						googletag.display(slotId);
-					} catch (e) {
-						console.error('[AdX Popup] Registration error:', e);
-					}
-				});
-
-				// Wire close handlers
-				this.overlay.find('.adxbyms-popup-close-btn').on('click', () => {
-					this.closePopup();
-				});
-
-				// Allow backdrop click dismiss
-				this.overlay.on('click', (e) => {
-					if (e.target === this.overlay[0]) {
-						this.closePopup();
-					}
+						}
+					});
 				});
 			},
 
-			closePopup: function () {
-				this.overlay.removeClass('show');
-				setTimeout(() => {
-					this.overlay.css('display', 'none');
-				}, 300);
+			showAd: function (adPopup) {
+				if (this.adDisplayed) return;
 
-				// Remove scroll listener
-				window.removeEventListener('scroll', this.onScroll);
+				googletag.cmd.push(() => {
+					googletag.display("ad-slot");
+				});
+
+				adPopup.style.display = "flex";
+				this.adDisplayed = true;
+
+				this.setCapped();
+				window.removeEventListener("scroll", this.onScroll);
+			},
+
+			onScroll: function () {
+				if (this.adDisplayed) return;
+
+				const scrollTop = window.scrollY || document.documentElement.scrollTop;
+				const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+				const triggerPercent = this.config.scroll_trigger || 0.5;
+
+				const hasScrolledEnough = docHeight > 0 && (scrollTop / docHeight) >= triggerPercent;
+
+				if (hasScrolledEnough) {
+					this.loadGPT(() => {
+						const adPopup = document.getElementById("ad-popup") || this.createPopup();
+						this.setupAd(adPopup);
+						this.showAd(adPopup);
+					});
+				}
 			}
 		};
 
@@ -352,6 +388,7 @@
 			config: window.ADXBYMS_BUTTON_REWARDED_DATA || {},
 			rewardedEvt: null,
 			pendingTargetUrl: null,
+			clickedEl: null,
 
 			init: function () {
 				if (!this.config.enabled || !this.config.networkCode || !this.config.keywords) {
@@ -367,6 +404,13 @@
 				// Bind to clicks on links/buttons
 				$('body').on('click', 'a, button', (e) => {
 					const el = $(e.currentTarget);
+					
+					// If already bypassed, let the click proceed
+					if (el.data('adx-bypassed')) {
+						el.removeData('adx-bypassed');
+						return;
+					}
+
 					const text = el.text().toLowerCase();
 					
 					let match = false;
@@ -379,6 +423,7 @@
 					
 					if (match) {
 						e.preventDefault();
+						this.clickedEl = el;
 						const href = el.attr('href');
 						this.pendingTargetUrl = (href && href !== '#' && !href.startsWith('javascript:')) ? href : null;
 						
@@ -411,6 +456,7 @@
 				$(this.consentOverlay).on('click', '#adxbyms-btn-rewarded-cancel', () => {
 					this.consentOverlay.style.display = "none";
 					this.pendingTargetUrl = null;
+					this.clickedEl = null;
 				});
 
 				$(this.consentOverlay).on('click', '#adxbyms-btn-rewarded-allow', (e) => {
@@ -419,9 +465,15 @@
 
 					if (!this.rewardedEvt) {
 						// Ad is not ready or failed to load. Fallback: just proceed immediately.
-						console.warn('[AdX Btn Rewarded] Ad not ready, proceeding to link directly.');
+						console.warn('[AdX Btn Rewarded] Ad not ready, proceeding directly.');
 						this.consentOverlay.style.display = "none";
-						if (this.pendingTargetUrl) window.location.href = this.pendingTargetUrl;
+						if (this.clickedEl && this.clickedEl.length) {
+							this.clickedEl.data('adx-bypassed', true);
+							this.clickedEl[0].click();
+							this.clickedEl = null;
+						} else if (this.pendingTargetUrl) {
+							window.location.href = this.pendingTargetUrl;
+						}
 						return;
 					}
 
@@ -436,7 +488,13 @@
 					} catch (err) {
 						console.error('[AdX Btn Rewarded] Failed to show ad', err);
 						this.consentOverlay.style.display = "none";
-						if (this.pendingTargetUrl) window.location.href = this.pendingTargetUrl;
+						if (this.clickedEl && this.clickedEl.length) {
+							this.clickedEl.data('adx-bypassed', true);
+							this.clickedEl[0].click();
+							this.clickedEl = null;
+						} else if (this.pendingTargetUrl) {
+							window.location.href = this.pendingTargetUrl;
+						}
 					}
 				});
 			},
@@ -471,7 +529,11 @@
 
 							googletag.pubads().addEventListener('rewardedSlotClosed', (evt) => {
 								if (evt.slot === slot) {
-									if (this.pendingTargetUrl) {
+									if (this.clickedEl && this.clickedEl.length) {
+										this.clickedEl.data('adx-bypassed', true);
+										this.clickedEl[0].click();
+										this.clickedEl = null;
+									} else if (this.pendingTargetUrl) {
 										window.location.href = this.pendingTargetUrl;
 									}
 									// Destroy and request a new one for next click, freeing up the out-of-page slot limit
