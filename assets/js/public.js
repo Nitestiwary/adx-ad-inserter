@@ -527,6 +527,25 @@
 								}
 							});
 
+							googletag.pubads().addEventListener('slotRenderEnded', (evt) => {
+								if (evt.slot === slot && evt.isEmpty) {
+									console.warn('[AdX Btn Rewarded] Ad failed to fill, bypassing and proceeding directly.');
+									if (this.consentOverlay) {
+										this.consentOverlay.style.display = "none";
+									}
+									if (this.clickedEl && this.clickedEl.length) {
+										this.clickedEl.data('adx-bypassed', true);
+										this.clickedEl[0].click();
+										this.clickedEl = null;
+									} else if (this.pendingTargetUrl) {
+										window.location.href = this.pendingTargetUrl;
+									}
+									googletag.destroySlots([slot]);
+									this.rewardedEvt = null;
+									this.initRewardedSlot();
+								}
+							});
+
 							googletag.pubads().addEventListener('rewardedSlotClosed', (evt) => {
 								if (evt.slot === slot) {
 									if (this.clickedEl && this.clickedEl.length) {
