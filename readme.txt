@@ -4,7 +4,7 @@ Donate link: https://monetiscope.com/
 Tags: ad-inserter, ad-manager, ads, adsense, header-footer
 Requires at least: 5.0
 Tested up to: 7.0
-Stable tag: 1.3.6
+Stable tag: 1.3.7
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -116,6 +116,12 @@ This plugin enqueues the following external script resources:
   * **Privacy**: [Zapier Privacy Policy](https://zapier.com/privacy).
 
 == Changelog ==
+
+= 1.3.7 =
+* Fixed: Implemented Interstitial Ad frontend rendering using standard Google Publisher Tag format.
+* Improved: Updated Display Ad code to match Google Publisher Tag standard format with enableSingleRequest() and automated dimensions calculation.
+* Improved: Each Display Ad block generates a unique container ID to avoid ad slot collisions.
+* Added: Target Pages filter for Anchor Ads to control specific page types where anchor ads appear.
 
 = 1.3.6 =
 * Fixed: Overhauled pop-up ads script to use a non-blocking container with background scrolling and page navigation support.

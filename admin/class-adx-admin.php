@@ -44,6 +44,7 @@ class Adx_Admin {
 			'adxbyms_anchor_enabled',
 			'adxbyms_anchor_network_code',
 			'adxbyms_anchor_position',
+			'adxbyms_anchor_pages',
 			'adxbyms_offerwall_onscroll_enabled',
 			'adxbyms_offerwall_onscroll_network_code',
 			'adxbyms_offerwall_onscroll_logo_url',

@@ -140,46 +140,41 @@ class Adx_Gpt_Manager {
 		// Normalize sizes for JS representation
 		$sizes_js = $this->format_sizes_for_js( $sizes );
 
-		// Hostname dynamic setting
-		$site_host = wp_parse_url( get_site_url(), PHP_URL_HOST );
+		// Calculate min dimensions for inner div
+		$min_dims = $this->calculate_min_dimensions( $sizes );
 
 		// Build slot JS call
 		ob_start();
 		?>
-		<div id="<?php echo esc_attr( $div_id ); ?>" class="adxbyms-gpt-container adx-align-<?php echo esc_attr( $alignment ); ?>" style="<?php echo esc_attr( $align_style ); ?>">
-			<span style="opacity:0.3;display:block;font-size:9px;text-align:center;"><?php esc_html_e( 'Advertisement', 'adx-ad-inserter' ); ?></span>
-			<script type="text/javascript">
-				window.googletag = window.googletag || { cmd: [] };
-				window.googletag.cmd.push(function() {
-					try {
-						<?php if ( ! empty( $mapping_js ) ) : ?>
-							// Size mapping logic
-							var sizeMapping = <?php echo $mapping_js; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
-							var slot = googletag.defineSlot('<?php echo esc_js( $network_code ); ?>', <?php echo $sizes_js; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>, '<?php echo esc_js( $div_id ); ?>')
-								.defineSizeMapping(sizeMapping)
-								.addService(googletag.pubads());
-						<?php else : ?>
-							var slot = googletag.defineSlot('<?php echo esc_js( $network_code ); ?>', <?php echo $sizes_js; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>, '<?php echo esc_js( $div_id ); ?>')
-								.addService(googletag.pubads());
-						<?php endif; ?>
+		<div class="adxbyms-gpt-container adx-align-<?php echo esc_attr( $alignment ); ?>" style="<?php echo esc_attr( $align_style ); ?>">
+			<script>
+				window.googletag = window.googletag || {cmd: []};
+				googletag.cmd.push(function() {
+					<?php if ( ! empty( $mapping_js ) ) : ?>
+						var sizeMapping = <?php echo $mapping_js; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
+						googletag.defineSlot('<?php echo esc_js( $network_code ); ?>', <?php echo $sizes_js; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>, '<?php echo esc_js( $div_id ); ?>')
+							.defineSizeMapping(sizeMapping)
+							.addService(googletag.pubads());
+					<?php else : ?>
+						googletag.defineSlot('<?php echo esc_js( $network_code ); ?>', <?php echo $sizes_js; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>, '<?php echo esc_js( $div_id ); ?>')
+							.addService(googletag.pubads());
+					<?php endif; ?>
 
-						<?php if ( ! empty( $site_host ) ) : ?>
-							googletag.pubads().set('page_url', '<?php echo esc_js( $site_host ); ?>');
-						<?php endif; ?>
+					<?php if ( ! empty( $targeting ) && is_array( $targeting ) ) : ?>
+						<?php foreach ( $targeting as $key => $val ) : ?>
+							googletag.pubads().setTargeting('<?php echo esc_js( $key ); ?>', '<?php echo esc_js( $val ); ?>');
+						<?php endforeach; ?>
+					<?php endif; ?>
 
-						<?php if ( ! empty( $targeting ) && is_array( $targeting ) ) : ?>
-							<?php foreach ( $targeting as $key => $val ) : ?>
-								slot.setTargeting('<?php echo esc_js( $key ); ?>', '<?php echo esc_js( $val ); ?>');
-							<?php endforeach; ?>
-						<?php endif; ?>
-
-						googletag.enableServices();
-						googletag.display('<?php echo esc_js( $div_id ); ?>');
-					} catch(e) {
-						console.error("[AdX] GPT registration error:", e);
-					}
+					googletag.pubads().enableSingleRequest();
+					googletag.enableServices();
 				});
 			</script>
+			<div id='<?php echo esc_attr( $div_id ); ?>' style='min-width: <?php echo esc_attr( $min_dims['width'] ); ?>px; min-height: <?php echo esc_attr( $min_dims['height'] ); ?>px;'>
+				<script>
+					googletag.cmd.push(function() { googletag.display('<?php echo esc_js( $div_id ); ?>'); });
+				</script>
+			</div>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -222,5 +217,37 @@ class Adx_Gpt_Manager {
 		}
 
 		return '[' . implode( ',', $out ) . ']';
+	}
+
+	/**
+	 * Calculate minimum width and height from size options.
+	 *
+	 * @param mixed $sizes Array of size strings.
+	 * @return array Array with 'width' and 'height' keys.
+	 */
+	private function calculate_min_dimensions( $sizes ) {
+		$min_w = PHP_INT_MAX;
+		$min_h = PHP_INT_MAX;
+
+		if ( ! is_array( $sizes ) ) {
+			$sizes = array( $sizes );
+		}
+
+		foreach ( $sizes as $sz ) {
+			$sz = strtolower( trim( $sz ) );
+			if ( 'fluid' === $sz ) {
+				continue;
+			}
+			$nums = array_map( 'intval', explode( 'x', str_replace( ' ', '', $sz ) ) );
+			if ( 2 === count( $nums ) && $nums[0] && $nums[1] ) {
+				$min_w = min( $min_w, $nums[0] );
+				$min_h = min( $min_h, $nums[1] );
+			}
+		}
+
+		return array(
+			'width'  => ( PHP_INT_MAX === $min_w ) ? 300 : $min_w,
+			'height' => ( PHP_INT_MAX === $min_h ) ? 250 : $min_h,
+		);
 	}
 }
