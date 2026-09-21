@@ -4,7 +4,7 @@ Donate link: https://monetiscope.com/
 Tags: ad-inserter, ad-manager, ads, adsense, header-footer
 Requires at least: 5.0
 Tested up to: 7.0
-Stable tag: 1.3.7
+Stable tag: 1.3.8
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -116,6 +116,9 @@ This plugin enqueues the following external script resources:
   * **Privacy**: [Zapier Privacy Policy](https://zapier.com/privacy).
 
 == Changelog ==
+
+= 1.3.8 =
+* Fixed: Updated Interstitial Ad placement to Google Native Out-Of-Page Web Interstitial format in header for seamless full-screen overlay rendering and reliable display.
 
 = 1.3.7 =
 * Fixed: Implemented Interstitial Ad frontend rendering using standard Google Publisher Tag format.

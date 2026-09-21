@@ -912,6 +912,29 @@ class Adx_Public {
 			}
 		}
 
+		// 1.5. Web Interstitial Ads (Native OutOfPage format)
+		if ( 'true' === get_option( 'adxbyms_interstitial_enabled', 'false' ) ) {
+			$interstitial_code = get_option( 'adxbyms_interstitial_network_code', '' );
+			if ( ! empty( $interstitial_code ) ) {
+				?>
+				<script type="text/javascript">
+					window.googletag = window.googletag || { cmd: [] };
+					googletag.cmd.push(function() {
+						try {
+							var interstitialSlot = googletag.defineOutOfPageSlot('<?php echo esc_js( $interstitial_code ); ?>', googletag.enums.OutOfPageFormat.INTERSTITIAL);
+							if (interstitialSlot) {
+								interstitialSlot.addService(googletag.pubads());
+								googletag.pubads().enableSingleRequest();
+								googletag.enableServices();
+								googletag.display(interstitialSlot);
+							}
+						} catch(e) {}
+					});
+				</script>
+				<?php
+			}
+		}
+
 		// 2. Custom header scripts
 		if ( 'true' === get_option( 'adxbyms_custom_enabled', 'false' ) ) {
 			$header_code = get_option( 'adxbyms_header_code', '' );
@@ -944,29 +967,6 @@ class Adx_Public {
 						</div>
 						<div id="adxbyms-popup-slot-div" class="adxbyms-popup-ad-slot"></div>
 					</div>
-				</div>
-				<?php
-			}
-		}
-
-		// 1.5. Interstitial Ad (defineSlot with 320x480)
-		if ( 'true' === get_option( 'adxbyms_interstitial_enabled', 'false' ) ) {
-			$interstitial_code = get_option( 'adxbyms_interstitial_network_code', '' );
-			if ( ! empty( $interstitial_code ) ) {
-				$interstitial_div_id = 'div-gpt-ad-interstitial-' . time() . '-0';
-				?>
-				<script>
-					window.googletag = window.googletag || {cmd: []};
-					googletag.cmd.push(function() {
-						googletag.defineSlot('<?php echo esc_js( $interstitial_code ); ?>', [320, 480], '<?php echo esc_js( $interstitial_div_id ); ?>').addService(googletag.pubads());
-						googletag.pubads().enableSingleRequest();
-						googletag.enableServices();
-					});
-				</script>
-				<div id='<?php echo esc_attr( $interstitial_div_id ); ?>' style='min-width: 320px; min-height: 480px;'>
-					<script>
-						googletag.cmd.push(function() { googletag.display('<?php echo esc_js( $interstitial_div_id ); ?>'); });
-					</script>
 				</div>
 				<?php
 			}
