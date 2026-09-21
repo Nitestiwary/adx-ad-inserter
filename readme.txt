@@ -27,8 +27,9 @@ This version introduces **AdX Ad Inserter Premium Updates**, introducing advance
 * **Side Rail Ads** - Sticky left and right column rails for screens wider than 1200px. Supports viewability-based dynamic refreshing (min 30s) and close buttons.
 * **Button Rewarded Ads** - Reward users with incentives for watching a short video ad.
 * **Offerwall Ads** - Display an offerwall with multiple offers that generate more revenue.
+* **Anchor Ads (Sticky Top/Bottom)** - Out-of-page anchor banners with granular Target Pages filtering (Single Posts, Homepage, Category Pages, Static Pages, Search Results, Tag Archives).
+* **Interstitial Ads** - Google Native Out-Of-Page Web Interstitial format seamlessly triggered during natural page transitions for maximum ad viewability and CPM.
 * **Header & Footer Ads** - Dedicated slots to appear at the very top or bottom of your pages for maximum visibility.
-* **Interstitial Ads** - Full-page ads shown between content or during page transitions.
 * **Exclude Links & Pages** - Suppress all ad layouts on specific pages using comma-separated paths or queries.
 * **ads.txt Manager (Built-in)** - Edit `/ads.txt` directly from your admin panel. Includes fail-safes and query-vars rewrites.
 
@@ -73,6 +74,8 @@ This version introduces **AdX Ad Inserter Premium Updates**, introducing advance
    * **Adsense Ads / Custom**: Paste your raw AdSense or scripts, choose insertion (e.g. before heading), alignment, and targets.
    * **Responsive Ads**: Enter your responsive ad slot line and define standard placements. Supports precise "Index (X)" offset targets.
    * **Popup Ads**: Enter slot path, trigger scroll depth, target screens, and set cap to "one time in 24 hours".
+   * **Anchor Ads**: Select top or bottom anchor position, enter slot line, and select target pages (e.g. single posts or homepage).
+   * **Interstitial Ads**: Enable full-screen Web Interstitials and provide your Google Ad Manager slot path.
    * **Flying Carpet Ads**: Enable full-screen mobile-optimized parallax slots inside content paragraphs.
    * **Side Rail Ads**: Add a single slot line to automatically float matching left/right columns on desktop screens.
    * **Rewarded Ads**: Configure video rewarded ad slots and incentive text.
